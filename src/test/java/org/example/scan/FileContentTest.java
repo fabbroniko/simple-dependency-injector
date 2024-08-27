@@ -15,7 +15,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-class FileDirectoryContentTest {
+class FileContentTest {
 
     private static final String PACKAGE = "java.lang";
     private static final String INVALID_FILE_NAME = "invalid.png";
@@ -26,7 +26,7 @@ class FileDirectoryContentTest {
     @Mock
     private ClassLoaderWrapper classLoaderWrapper;
     @InjectMocks
-    private FileDirectoryContent fileDirectoryContent;
+    private FileContent fileDirectoryContent;
 
     @Test
     void shouldReturnEmptySetIfNotAClassFile() {

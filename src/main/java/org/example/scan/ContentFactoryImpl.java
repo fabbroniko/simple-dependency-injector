@@ -3,12 +3,12 @@ package org.example.scan;
 public class ContentFactoryImpl implements ContentFactory {
 
     @Override
-    public DirectoryContent createDirectory() {
-        return new SubDirectoryContent(this);
+    public FileSystemContent createDirectory() {
+        return new DirectoryContent(this);
     }
 
     @Override
-    public DirectoryContent createFile() {
-        return new FileDirectoryContent(new DefaultClassLoaderWrapper());
+    public FileSystemContent createFile() {
+        return new FileContent(new DefaultClassLoaderWrapper());
     }
 }

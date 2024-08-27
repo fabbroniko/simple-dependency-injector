@@ -33,7 +33,7 @@ public class ClasspathClassScannerTest {
     @Mock
     private URL url;
     @Mock
-    private DirectoryContent directoryContent;
+    private FileSystemContent fileSystemContent;
     @Mock
     private Set<Class<?>> scannedClasses;
     @InjectMocks
@@ -43,8 +43,8 @@ public class ClasspathClassScannerTest {
     void setUp() {
         when(resourceLocator.locate(anyString())).thenReturn(url);
         when(fileFactory.create(any())).thenReturn(file);
-        when(contentFactory.createDirectory()).thenReturn(directoryContent);
-        when(directoryContent.getClasses(anyString(), any())).thenReturn(scannedClasses);
+        when(contentFactory.createDirectory()).thenReturn(fileSystemContent);
+        when(fileSystemContent.getClasses(anyString(), any())).thenReturn(scannedClasses);
     }
 
     @Test
@@ -72,7 +72,7 @@ public class ClasspathClassScannerTest {
     void shouldGetClassesFromDirectoryContent() {
         classScanner.get(PACKAGE);
 
-        verify(directoryContent).getClasses(PACKAGE, file);
+        verify(fileSystemContent).getClasses(PACKAGE, file);
     }
 
     @Test

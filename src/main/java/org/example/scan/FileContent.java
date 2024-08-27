@@ -3,11 +3,11 @@ package org.example.scan;
 import java.io.File;
 import java.util.Set;
 
-public class FileDirectoryContent implements DirectoryContent {
+public class FileContent implements FileSystemContent {
 
     private final ClassLoaderWrapper classLoaderWrapper;
 
-    public FileDirectoryContent(ClassLoaderWrapper classLoaderWrapper) {
+    public FileContent(ClassLoaderWrapper classLoaderWrapper) {
         this.classLoaderWrapper = classLoaderWrapper;
     }
 

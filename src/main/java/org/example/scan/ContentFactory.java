@@ -2,7 +2,7 @@ package org.example.scan;
 
 public interface ContentFactory {
 
-    DirectoryContent createDirectory();
+    FileSystemContent createDirectory();
 
-    DirectoryContent createFile();
+    FileSystemContent createFile();
 }
