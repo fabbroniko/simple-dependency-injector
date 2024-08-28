@@ -5,15 +5,20 @@ import java.util.Optional;
 
 public class SimpleRegistry implements Registry {
 
-    private final Map<Class<?>, Object> registry;
+    private final Map<Class<?>, Instance> registry;
 
-    public SimpleRegistry(final Map<Class<?>, Object> registry) {
+    public SimpleRegistry(final Map<Class<?>, Instance> registry) {
         this.registry = registry;
     }
 
     @Override
-    public void insert(final Class<?> clazz, final Object instance) {
-        registry.put(clazz, instance);
+    public void process(final Class<?> target) {
+        registry.put(target, new BaseInstance(State.PROCESSING, null));
+    }
+
+    @Override
+    public void insert(final Class<?> target, final Object instance) {
+        registry.put(target, new BaseInstance(State.CREATED, instance));
     }
 
     @Override
@@ -21,6 +26,17 @@ public class SimpleRegistry implements Registry {
         return registry.keySet().stream()
             .filter(clazz::isAssignableFrom)
             .findAny()
-            .map(registry::get);
+            .map(registry::get)
+            .map(Instance::instance);
+    }
+
+    @Override
+    public boolean isProcessing(final Class<?> target) {
+        final Instance instance = registry.get(target);
+        if (instance == null) {
+            return false;
+        }
+
+        return instance.state().equals(State.PROCESSING);
     }
 }

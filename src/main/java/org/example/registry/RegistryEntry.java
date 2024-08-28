@@ -4,5 +4,5 @@ public interface RegistryEntry {
 
     Class<?> clazz();
 
-    Object instance();
+    Instance instance();
 }

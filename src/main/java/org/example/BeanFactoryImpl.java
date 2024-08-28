@@ -1,5 +1,6 @@
 package org.example;
 
+import org.example.exception.CircularDependencyException;
 import org.example.exception.DependencyNotInitializableException;
 import org.example.registry.Registry;
 
@@ -19,6 +20,12 @@ public class BeanFactoryImpl implements BeanFactory {
                 .findAny()
                 .orElseThrow(DependencyNotInitializableException::new);
         }
+
+        if (registry.isProcessing(targetClass)) {
+            throw new CircularDependencyException();
+        }
+
+        registry.process(clazz);
 
         final Constructor<?> constructor = targetClass.getConstructors()[0];
         final Class<?>[] params = constructor.getParameterTypes();
