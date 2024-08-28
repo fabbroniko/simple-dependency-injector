@@ -14,7 +14,7 @@ public class WithDependenciesTest {
         DependencyInjector.run(WithDependenciesTest.class);
 
         assertThat(DependencyInjector.get(WithDependencyTestClass.class))
-            .extracting(WithDependencyTestClass::getDependency)
+            .extracting(WithDependencyTestClass::dependency)
             .isNotNull();
     }
 }

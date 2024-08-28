@@ -15,7 +15,7 @@ public class DependsOnInterfaceTest {
 
         assertThat(DependencyInjector.get(DependsOnInterface.class))
             .isNotNull()
-            .extracting(DependsOnInterface::getSampleInterface)
+            .extracting(DependsOnInterface::sampleInterface)
             .isNotNull();
     }
 }

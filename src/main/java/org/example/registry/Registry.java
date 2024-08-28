@@ -4,7 +4,11 @@ import java.util.Optional;
 
 public interface Registry {
 
-    void insert(final Class<?> clazz, final Object instance);
+    void process(final Class<?> target);
 
-    Optional<Object> getInstance(final Class<?> clazz);
+    void insert(final Class<?> target, final Object instance);
+
+    Optional<Object> getInstance(final Class<?> target);
+
+    boolean isProcessing(final Class<?> target);
 }
