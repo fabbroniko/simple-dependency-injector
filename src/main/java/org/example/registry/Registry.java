@@ -8,7 +8,7 @@ public interface Registry {
 
     void insert(final Class<?> target, final Object instance);
 
-    Optional<Object> getInstance(final Class<?> clazz);
+    Optional<Object> getInstance(final Class<?> target);
 
     boolean isProcessing(final Class<?> target);
 }

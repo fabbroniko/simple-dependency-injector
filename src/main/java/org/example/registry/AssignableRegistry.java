@@ -3,28 +3,32 @@ package org.example.registry;
 import java.util.Map;
 import java.util.Optional;
 
-public class SimpleRegistry implements Registry {
+public class AssignableRegistry implements Registry {
 
     private final Map<Class<?>, Instance> registry;
+    private final InstanceFactory instanceFactory;
 
-    public SimpleRegistry(final Map<Class<?>, Instance> registry) {
+    public AssignableRegistry(final Map<Class<?>, Instance> registry,
+                              final InstanceFactory instanceFactory) {
+
         this.registry = registry;
+        this.instanceFactory = instanceFactory;
     }
 
     @Override
     public void process(final Class<?> target) {
-        registry.put(target, new BaseInstance(State.PROCESSING, null));
+        registry.put(target, instanceFactory.createProcessing());
     }
 
     @Override
     public void insert(final Class<?> target, final Object instance) {
-        registry.put(target, new BaseInstance(State.COMPLETE, instance));
+        registry.put(target, instanceFactory.createCompleted(instance));
     }
 
     @Override
-    public Optional<Object> getInstance(final Class<?> clazz) {
+    public Optional<Object> getInstance(final Class<?> target) {
         return registry.keySet().stream()
-            .filter(clazz::isAssignableFrom)
+            .filter(target::isAssignableFrom)
             .findAny()
             .map(registry::get)
             .map(Instance::instance);
