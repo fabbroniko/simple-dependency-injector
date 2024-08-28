@@ -4,7 +4,5 @@ public enum State {
 
     COMPLETE,
 
-    PROCESSING,
-
-    CREATED
+    PROCESSING
 }

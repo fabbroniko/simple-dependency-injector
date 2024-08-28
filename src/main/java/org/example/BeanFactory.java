@@ -2,7 +2,6 @@ package org.example;
 
 import org.example.registry.Registry;
 
-import java.util.Optional;
 import java.util.Set;
 
 public interface BeanFactory {

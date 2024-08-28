@@ -18,7 +18,7 @@ public class SimpleRegistry implements Registry {
 
     @Override
     public void insert(final Class<?> target, final Object instance) {
-        registry.put(target, new BaseInstance(State.CREATED, instance));
+        registry.put(target, new BaseInstance(State.COMPLETE, instance));
     }
 
     @Override
