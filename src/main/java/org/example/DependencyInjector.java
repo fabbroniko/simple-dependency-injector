@@ -4,7 +4,7 @@ import org.example.annotation.Component;
 import org.example.annotation.Configuration;
 import org.example.registry.Registry;
 import org.example.registry.RegistryFactory;
-import org.example.registry.BaseRegistryFactory;
+import org.example.registry.AssignableRegistryFactory;
 import org.example.scan.AnnotationPresentPredicate;
 import org.example.scan.AnnotationScanner;
 import org.example.scan.ClassScanner;
@@ -26,7 +26,7 @@ public class DependencyInjector {
         final AnnotationScanner annotationScanner = new GenericAnnotationScanner(classScanner, new AnnotationPresentPredicate(Component.class));
         final Set<Class<?>> annotatedClasses = annotationScanner.getAnnotatedClasses(rootPackage);
         final BeanFactory beanFactory = new BeanFactoryImpl();
-        final RegistryFactory registryFactory = new BaseRegistryFactory();
+        final RegistryFactory registryFactory = new AssignableRegistryFactory();
         registry = registryFactory.create();
 
         annotatedClasses.forEach(clazz -> {

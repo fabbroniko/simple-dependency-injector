@@ -2,7 +2,7 @@ package org.example.registry;
 
 import java.util.HashMap;
 
-public class BaseRegistryFactory implements RegistryFactory {
+public class AssignableRegistryFactory implements RegistryFactory {
 
     @Override
     public Registry create() {
