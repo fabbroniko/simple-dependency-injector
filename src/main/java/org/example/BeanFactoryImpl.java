@@ -1,7 +1,7 @@
 package org.example;
 
 import org.example.exception.CircularDependencyException;
-import org.example.exception.DependencyNotInitializableException;
+import org.example.exception.InvalidDependencyException;
 import org.example.registry.Registry;
 
 import java.lang.reflect.Constructor;
@@ -18,7 +18,11 @@ public class BeanFactoryImpl implements BeanFactory {
             targetClass = definedControllers.stream()
                 .filter(clazz::isAssignableFrom)
                 .findAny()
-                .orElseThrow(DependencyNotInitializableException::new);
+                .orElseThrow(InvalidDependencyException::new);
+        }
+
+        if (!definedControllers.contains(targetClass)) {
+            throw new InvalidDependencyException();
         }
 
         if (registry.isProcessing(targetClass)) {
