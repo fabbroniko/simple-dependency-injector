@@ -1,5 +1,6 @@
 package org.example.factory;
 
+import org.example.context.ApplicationContext;
 import org.example.exception.CircularDependencyException;
 import org.example.exception.InvalidComponentConstructorException;
 import org.example.exception.InvalidDependencyException;
@@ -20,8 +21,12 @@ public class ComponentFactoryImpl implements ComponentFactory {
         this.componentResolver = componentResolver;
     }
 
+    /* Responsibilities
+     * Validation (3)
+     */
+
     @Override
-    public Object create(final Registry registry, final Set<Class<?>> scannedComponents, final Class<?> clazz) {
+    public Object create(final Registry registry, final Set<Class<?>> scannedComponents, final Class<?> clazz, final ApplicationContext context) {
         final Class<?> targetClass = componentResolver.resolve(scannedComponents, clazz);
 
         if (!scannedComponents.contains(targetClass)) {
@@ -42,7 +47,7 @@ public class ComponentFactoryImpl implements ComponentFactory {
         final Constructor<?> constructor = constructors[0];
         final Class<?>[] params = constructor.getParameterTypes();
         final List<Object> vals = Arrays.stream(params)
-                .map(m -> registry.getInstance(m).orElseGet(() -> create(registry, scannedComponents, m)))
+                .map(context::getInstance)
                 .toList();
 
         try {

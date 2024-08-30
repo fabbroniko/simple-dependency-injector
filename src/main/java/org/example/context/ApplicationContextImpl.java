@@ -24,6 +24,6 @@ public class ApplicationContextImpl implements ApplicationContext {
     @SuppressWarnings("unchecked")
     public <T> T getInstance(final Class<?> target) {
         return (T) registry.getInstance(target)
-            .orElseGet(() -> componentFactory.create(registry, annotatedClasses, target));
+            .orElseGet(() -> componentFactory.create(registry, annotatedClasses, target, this));
     }
 }

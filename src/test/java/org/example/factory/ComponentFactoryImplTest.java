@@ -1,5 +1,6 @@
 package org.example.factory;
 
+import org.example.context.ApplicationContext;
 import org.example.exception.CircularDependencyException;
 import org.example.exception.InvalidDependencyException;
 import org.example.registry.Registry;
@@ -27,6 +28,8 @@ class ComponentFactoryImplTest {
     private Registry registry;
     @Mock
     private Set<Class<?>> scannedComponents;
+    @Mock
+    private ApplicationContext context;
     @InjectMocks
     private ComponentFactoryImpl beanFactory;
 
@@ -39,7 +42,7 @@ class ComponentFactoryImplTest {
     void shouldResolveClassToInitialize() {
         when(scannedComponents.contains(any(Class.class))).thenReturn(true);
 
-        beanFactory.create(registry, scannedComponents, Object.class);
+        beanFactory.create(registry, scannedComponents, Object.class, context);
 
         verify(componentResolver).resolve(scannedComponents, Object.class);
     }
@@ -48,7 +51,7 @@ class ComponentFactoryImplTest {
     void shouldThrowExceptionWhenTargetIsNotComponent() {
         when(scannedComponents.contains(any(Class.class))).thenReturn(false);
 
-        assertThatThrownBy(() -> beanFactory.create(registry, scannedComponents, Object.class))
+        assertThatThrownBy(() -> beanFactory.create(registry, scannedComponents, Object.class, context))
             .isInstanceOf(InvalidDependencyException.class);
     }
 
@@ -57,7 +60,7 @@ class ComponentFactoryImplTest {
         when(scannedComponents.contains(any(Class.class))).thenReturn(true);
         when(registry.isProcessing(any())).thenReturn(true);
 
-        assertThatThrownBy(() -> beanFactory.create(registry, scannedComponents, Object.class))
+        assertThatThrownBy(() -> beanFactory.create(registry, scannedComponents, Object.class, context))
             .isInstanceOf(CircularDependencyException.class);
     }
 
@@ -65,7 +68,7 @@ class ComponentFactoryImplTest {
     void shouldSetClassAsProcessing() {
         when(scannedComponents.contains(any(Class.class))).thenReturn(true);
 
-        beanFactory.create(registry, scannedComponents, Object.class);
+        beanFactory.create(registry, scannedComponents, Object.class, context);
 
         verify(registry).process(Object.class);
     }
