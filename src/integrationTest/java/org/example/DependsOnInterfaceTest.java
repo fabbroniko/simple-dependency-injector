@@ -11,11 +11,9 @@ public class DependsOnInterfaceTest {
 
     @Test
     void shouldInjectInterface() {
-        DependencyInjector.run(DependsOnInterfaceTest.class);
+        DependsOnInterface target = DependencyInjector.run(DependsOnInterfaceTest.class)
+            .getInstance(DependsOnInterface.class);
 
-        assertThat(DependencyInjector.get(DependsOnInterface.class))
-            .isNotNull()
-            .extracting(DependsOnInterface::sampleInterface)
-            .isNotNull();
+        assertThat(target.sampleInterface()).isNotNull();
     }
 }

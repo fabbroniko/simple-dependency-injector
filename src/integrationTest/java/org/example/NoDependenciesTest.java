@@ -11,8 +11,9 @@ public class NoDependenciesTest {
 
     @Test
     void shouldCreateInstanceOfNoDependenciesTestClass() {
-        DependencyInjector.run(NoDependenciesTest.class);
+        NoDependenciesTestClass target = DependencyInjector.run(NoDependenciesTest.class)
+            .getInstance(NoDependenciesTestClass.class);
 
-        assertThat(DependencyInjector.get(NoDependenciesTestClass.class)).isNotNull();
+        assertThat(target).isNotNull();
     }
 }

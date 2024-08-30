@@ -11,10 +11,10 @@ public class WithDependenciesTest {
 
     @Test
     void shouldCreateInstanceOfWithDependencyTestClass() {
-        DependencyInjector.run(WithDependenciesTest.class);
+        WithDependencyTestClass target = DependencyInjector.run(WithDependenciesTest.class)
+            .getInstance(WithDependencyTestClass.class);
 
-        assertThat(DependencyInjector.get(WithDependencyTestClass.class))
-            .extracting(WithDependencyTestClass::dependency)
+        assertThat(target.dependency())
             .isNotNull();
     }
 }

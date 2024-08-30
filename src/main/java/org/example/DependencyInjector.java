@@ -2,6 +2,8 @@ package org.example;
 
 import org.example.annotation.Component;
 import org.example.annotation.Configuration;
+import org.example.context.ApplicationContext;
+import org.example.context.ApplicationContextImpl;
 import org.example.factory.AssignableComponentResolver;
 import org.example.factory.ComponentFactory;
 import org.example.factory.ComponentFactoryImpl;
@@ -21,26 +23,15 @@ import java.util.Set;
 
 public class DependencyInjector {
 
-    private static Registry registry;
-
-    public static void run(final Class<?> configuration) {
+    public static ApplicationContext run(final Class<?> configuration) {
         final String rootPackage = configuration.getAnnotation(Configuration.class).componentScan();
         final ClassScanner classScanner = new ClasspathClassScanner(new ContentFactoryImpl(), new SystemClassLoaderResourceLocator(), new URIFileFactory());
         final AnnotationScanner annotationScanner = new GenericAnnotationScanner(classScanner, new AnnotationPresentPredicate(Component.class));
         final Set<Class<?>> annotatedClasses = annotationScanner.getAnnotatedClasses(rootPackage);
         final ComponentFactory componentFactory = new ComponentFactoryImpl(new AssignableComponentResolver());
         final RegistryFactory registryFactory = new AssignableRegistryFactory();
-        registry = registryFactory.create();
+        final Registry registry = registryFactory.create();
 
-        annotatedClasses.forEach(clazz -> {
-            if(registry.getInstance(clazz).isEmpty()) {
-                componentFactory.create(registry, annotatedClasses, clazz);
-            }
-        });
-    }
-
-    @SuppressWarnings("unchecked")
-    public static <T> T get(final Class<T> c) {
-        return (T) registry.getInstance(c).orElseThrow();
+        return new ApplicationContextImpl(registry, annotatedClasses, componentFactory);
     }
 }
