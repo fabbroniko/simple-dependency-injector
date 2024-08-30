@@ -1,9 +1,6 @@
 package org.example.factory;
 
 import org.example.context.ApplicationContext;
-import org.example.exception.CircularDependencyException;
-import org.example.exception.InvalidComponentConstructorException;
-import org.example.exception.InvalidDependencyException;
 import org.example.registry.Registry;
 
 import java.lang.reflect.Constructor;
@@ -13,37 +10,30 @@ import java.util.Set;
 
 public class ComponentFactoryImpl implements ComponentFactory {
 
-    private static final int COMPONENT_CONSTRUCTORS_ALLOWED = 1;
-
     private final ComponentResolver componentResolver;
+    private final Registry registry;
+    private final Set<Class<?>> scannedComponents;
+    private final Validator validator;
 
-    public ComponentFactoryImpl(final ComponentResolver componentResolver) {
+    public ComponentFactoryImpl(final ComponentResolver componentResolver,
+                                final Registry registry,
+                                final Set<Class<?>> scannedComponents,
+                                final Validator validator) {
         this.componentResolver = componentResolver;
+        this.registry = registry;
+        this.scannedComponents = scannedComponents;
+        this.validator = validator;
     }
 
-    /* Responsibilities
-     * Validation (3)
-     */
-
     @Override
-    public Object create(final Registry registry, final Set<Class<?>> scannedComponents, final Class<?> clazz, final ApplicationContext context) {
+    public Object create(final Class<?> clazz, final ApplicationContext context) {
         final Class<?> targetClass = componentResolver.resolve(scannedComponents, clazz);
-
-        if (!scannedComponents.contains(targetClass)) {
-            throw new InvalidDependencyException();
-        }
-
-        if (registry.isProcessing(targetClass)) {
-            throw new CircularDependencyException();
-        }
+        validator.validate(registry, scannedComponents, targetClass);
 
         registry.process(clazz);
+        registry.process(targetClass);
 
         final Constructor<?>[] constructors = targetClass.getConstructors();
-        if(constructors.length != COMPONENT_CONSTRUCTORS_ALLOWED) {
-            throw new InvalidComponentConstructorException();
-        }
-
         final Constructor<?> constructor = constructors[0];
         final Class<?>[] params = constructor.getParameterTypes();
         final List<Object> vals = Arrays.stream(params)
@@ -53,6 +43,7 @@ public class ComponentFactoryImpl implements ComponentFactory {
         try {
             final Object instance = constructor.newInstance(vals.toArray());
             registry.insert(clazz, instance);
+            registry.insert(targetClass, instance);
             return instance;
         } catch (Exception e) {
             throw new RuntimeException(e);
