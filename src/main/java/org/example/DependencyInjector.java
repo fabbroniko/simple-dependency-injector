@@ -2,6 +2,9 @@ package org.example;
 
 import org.example.annotation.Component;
 import org.example.annotation.Configuration;
+import org.example.factory.AssignableComponentResolver;
+import org.example.factory.ComponentFactory;
+import org.example.factory.ComponentFactoryImpl;
 import org.example.registry.Registry;
 import org.example.registry.RegistryFactory;
 import org.example.registry.AssignableRegistryFactory;
@@ -25,13 +28,13 @@ public class DependencyInjector {
         final ClassScanner classScanner = new ClasspathClassScanner(new ContentFactoryImpl(), new SystemClassLoaderResourceLocator(), new URIFileFactory());
         final AnnotationScanner annotationScanner = new GenericAnnotationScanner(classScanner, new AnnotationPresentPredicate(Component.class));
         final Set<Class<?>> annotatedClasses = annotationScanner.getAnnotatedClasses(rootPackage);
-        final BeanFactory beanFactory = new BeanFactoryImpl();
+        final ComponentFactory componentFactory = new ComponentFactoryImpl(new AssignableComponentResolver());
         final RegistryFactory registryFactory = new AssignableRegistryFactory();
         registry = registryFactory.create();
 
         annotatedClasses.forEach(clazz -> {
             if(registry.getInstance(clazz).isEmpty()) {
-                beanFactory.create(registry, annotatedClasses, clazz);
+                componentFactory.create(registry, annotatedClasses, clazz);
             }
         });
     }
