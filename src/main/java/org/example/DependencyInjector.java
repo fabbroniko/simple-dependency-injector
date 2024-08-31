@@ -5,12 +5,9 @@ import org.example.annotation.Configuration;
 import org.example.context.ApplicationContext;
 import org.example.context.ApplicationContextImpl;
 import org.example.factory.AssignableComponentResolver;
-import org.example.factory.ComponentFactory;
 import org.example.factory.ComponentFactoryImpl;
-import org.example.factory.ComponentFactoryValidator;
-import org.example.registry.Registry;
-import org.example.registry.RegistryFactory;
 import org.example.registry.AssignableRegistryFactory;
+import org.example.registry.RegistryFactory;
 import org.example.scan.AnnotationPresentPredicate;
 import org.example.scan.AnnotationScanner;
 import org.example.scan.ClassScanner;
@@ -30,9 +27,12 @@ public class DependencyInjector {
         final AnnotationScanner annotationScanner = new GenericAnnotationScanner(classScanner, new AnnotationPresentPredicate(Component.class));
         final Set<Class<?>> annotatedClasses = annotationScanner.getAnnotatedClasses(rootPackage);
         final RegistryFactory registryFactory = new AssignableRegistryFactory();
-        final Registry registry = registryFactory.create();
-        final ComponentFactory componentFactory = new ComponentFactoryImpl(new AssignableComponentResolver(), registry, annotatedClasses, new ComponentFactoryValidator());
 
-        return new ApplicationContextImpl(registry, componentFactory);
+        return new ApplicationContextImpl(
+            registryFactory.create(),
+            new ComponentFactoryImpl(),
+            new AssignableComponentResolver(),
+            annotatedClasses
+        );
     }
 }

@@ -4,5 +4,5 @@ import org.example.context.ApplicationContext;
 
 public interface ComponentFactory {
 
-    Object create(final Class<?> clazz, final ApplicationContext context);
+    Object create(final Class<?> target, final ApplicationContext context);
 }
