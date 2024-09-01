@@ -25,6 +25,6 @@ public class ClasspathClassScanner implements ClassScanner {
         final URL resource = resourceLocator.locate(rootPackageRelativePath);
         final File rootDirectory = fileFactory.create(resource);
 
-        return contentFactory.createDirectory().getClasses(rootPackage, rootDirectory);
+        return contentFactory.createJar().getClasses(rootPackage, rootDirectory);
     }
 }

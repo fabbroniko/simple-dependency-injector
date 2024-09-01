@@ -11,4 +11,9 @@ public class ContentFactoryImpl implements ContentFactory {
     public FileSystemContent createFile() {
         return new FileContent(new DefaultClassLoaderWrapper());
     }
+
+    @Override
+    public FileSystemContent createJar() {
+        return new JarContent();
+    }
 }
