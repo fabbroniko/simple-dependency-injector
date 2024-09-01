@@ -80,14 +80,14 @@ class ApplicationContextImplTest {
         void shouldResolveClassToInitialize() {
             applicationContext.getInstance(Integer.class);
 
-            verify(componentResolver).resolve(scannedComponents, Integer.class);
+            verify(componentResolver).resolve(Integer.class);
         }
 
         @Test
         void shouldRegisterTargetAsProcessing() {
             applicationContext.getInstance(Integer.class);
 
-            verify(registry).process(Integer.class);
+            verify(registry).process(Object.class);
         }
 
         @Test
@@ -126,7 +126,7 @@ class ApplicationContextImplTest {
 
             applicationContext.getInstance(Integer.class);
 
-            verify(registry).insert(Integer.class, instance);
+            verify(registry).insert(Object.class, instance);
         }
 
         @Test

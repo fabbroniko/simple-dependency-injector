@@ -4,6 +4,7 @@ import org.example.context.ApplicationContext;
 import org.example.exception.InvalidComponentConstructorException;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Parameter;
 import java.util.List;
 
 import static java.util.Arrays.stream;
@@ -16,9 +17,9 @@ public class ComponentFactoryImpl implements ComponentFactory {
             .findAny()
             .orElseThrow(InvalidComponentConstructorException::new);
 
-        final Class<?>[] params = constructor.getParameterTypes();
+        final Parameter[] params = constructor.getParameters();
         final List<Object> vals = stream(params)
-                .map(context::getInstance)
+                .map(a -> context.getInstance(a.getType(), a.getName()))
                 .toList();
 
         try {
