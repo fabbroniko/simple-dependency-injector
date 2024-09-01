@@ -59,6 +59,12 @@ class ApplicationContextImplTest {
             .isInstanceOf(CircularDependencyException.class);
     }
 
+    @Test
+    void shouldReturnApplicationContext() {
+        assertThat((Object) applicationContext.getInstance(ApplicationContext.class))
+            .isEqualTo(applicationContext);
+    }
+
     @Nested
     class GetInstanceTest {
 
