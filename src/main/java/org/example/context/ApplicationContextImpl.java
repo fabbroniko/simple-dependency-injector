@@ -30,6 +30,10 @@ public class ApplicationContextImpl implements ApplicationContext {
     @Override
     @SuppressWarnings("unchecked")
     public <T> T getInstance(final Class<?> target) {
+        if (target.equals(ApplicationContext.class)) {
+            return (T) this;
+        }
+
         final Class<?> targetClass = componentResolver.resolve(scannedComponents, target);
         if (!scannedComponents.contains(targetClass)) {
             throw new InvalidDependencyException();
