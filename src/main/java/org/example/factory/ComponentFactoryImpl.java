@@ -2,13 +2,21 @@ package org.example.factory;
 
 import org.example.context.ApplicationContext;
 import org.example.exception.InvalidComponentConstructorException;
+import org.example.naming.ConstructorParameterNameResolver;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Parameter;
 import java.util.List;
 
 import static java.util.Arrays.stream;
 
 public class ComponentFactoryImpl implements ComponentFactory {
+
+    private final ConstructorParameterNameResolver constructorParameterNameResolver;
+
+    public ComponentFactoryImpl(final ConstructorParameterNameResolver constructorParameterNameResolver) {
+        this.constructorParameterNameResolver = constructorParameterNameResolver;
+    }
 
     @Override
     public Object create(final Class<?> target, final ApplicationContext context) {
@@ -16,14 +24,14 @@ public class ComponentFactoryImpl implements ComponentFactory {
             .findAny()
             .orElseThrow(InvalidComponentConstructorException::new);
 
-        final Class<?>[] params = constructor.getParameterTypes();
+        final Parameter[] params = constructor.getParameters();
         final List<Object> vals = stream(params)
-                .map(context::getInstance)
+                .map(parameter -> context.getInstance(parameter.getType(), constructorParameterNameResolver.resolve(parameter)))
                 .toList();
 
         try {
             return constructor.newInstance(vals.toArray());
-        } catch (Exception e) {
+        } catch (final Exception e) {
             throw new RuntimeException(e);
         }
     }

@@ -1,6 +1,6 @@
 package org.example.registry;
 
-public class StoreInstanceFactory implements InstanceFactory {
+public class InstanceStoreFactory implements InstanceFactory {
 
     @Override
     public Instance createProcessing() {
