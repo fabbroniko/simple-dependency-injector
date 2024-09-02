@@ -1,9 +1,9 @@
 package org.example.context;
 
 import org.example.exception.CircularDependencyException;
-import org.example.exception.InvalidDependencyException;
 import org.example.factory.ComponentFactory;
 import org.example.factory.ComponentResolver;
+import org.example.naming.QualifyingNameResolver;
 import org.example.registry.Registry;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -34,6 +34,8 @@ class ApplicationContextImplTest {
     @Mock
     private ComponentResolver componentResolver;
     @Mock
+    private QualifyingNameResolver nameResolver;
+    @Mock
     private Set<Class<?>> scannedComponents;
     @Mock
     private Object instance;
@@ -41,28 +43,18 @@ class ApplicationContextImplTest {
     private ApplicationContextImpl applicationContext;
 
     @Test
-    void shouldThrowInvalidDependencyException() {
-        doReturn(Object.class).when(componentResolver).resolve(any(), any());
-        when(scannedComponents.contains(any(Class.class))).thenReturn(false);
-
-        assertThatThrownBy(() -> applicationContext.getInstance(Integer.class))
-            .isInstanceOf(InvalidDependencyException.class);
+    void shouldReturnSelfWhenTargetIsApplicationContext() {
+        assertThat((Object) applicationContext.getInstance(ApplicationContext.class))
+            .isEqualTo(applicationContext);
     }
 
     @Test
     void shouldThrowCircularDependencyException() {
         doReturn(Object.class).when(componentResolver).resolve(any(), any());
-        when(scannedComponents.contains(any(Class.class))).thenReturn(true);
         when(registry.isProcessing(any())).thenReturn(true);
 
         assertThatThrownBy(() -> applicationContext.getInstance(Integer.class))
             .isInstanceOf(CircularDependencyException.class);
-    }
-
-    @Test
-    void shouldReturnApplicationContext() {
-        assertThat((Object) applicationContext.getInstance(ApplicationContext.class))
-            .isEqualTo(applicationContext);
     }
 
     @Nested
@@ -71,13 +63,20 @@ class ApplicationContextImplTest {
         @BeforeEach
         void setUp() {
             doReturn(Object.class).when(componentResolver).resolve(any(), any());
-            when(scannedComponents.contains(any(Class.class))).thenReturn(true);
             when(registry.isProcessing(any())).thenReturn(false);
             when(registry.getInstance(any())).thenReturn(Optional.of(instance));
         }
 
         @Test
+        void shouldResolveName() {
+            applicationContext.getInstance(Object.class);
+
+            verify(nameResolver).resolveFor(Object.class);
+        }
+        @Test
         void shouldResolveClassToInitialize() {
+            when(nameResolver.resolveFor(any())).thenReturn("integer");
+
             applicationContext.getInstance(Integer.class);
 
             verify(componentResolver).resolve(Integer.class, "integer");
