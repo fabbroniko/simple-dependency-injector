@@ -1,21 +1,19 @@
 package org.example.factory;
 
-import org.example.annotation.Component;
 import org.example.exception.InvalidDependencyException;
+import org.example.naming.QualifyingNameResolver;
 
 import java.util.Set;
 
 public class AssignableComponentResolver implements ComponentResolver {
 
     private final Set<Class<?>> scannedComponents;
+    private final QualifyingNameResolver nameResolver;
 
-    public AssignableComponentResolver(Set<Class<?>> scannedComponents) {
+    public AssignableComponentResolver(final Set<Class<?>> scannedComponents,
+                                       final QualifyingNameResolver nameResolver) {
         this.scannedComponents = scannedComponents;
-    }
-
-    @Override
-    public Class<?> resolve(final Class<?> target) {
-        return resolve(target, qualifyingName(target));
+        this.nameResolver = nameResolver;
     }
 
     @Override
@@ -23,24 +21,16 @@ public class AssignableComponentResolver implements ComponentResolver {
         if (target.isInterface()) {
             return scannedComponents.stream()
                 .filter(target::isAssignableFrom)
-                .filter(component -> qualifyingName(component).equals(qualifyingName))
-                .findAny()
-                .orElseThrow(InvalidDependencyException::new);
+                .filter(component -> nameResolver.resolveFor(component).equals(qualifyingName))
+                .findAny().orElseGet(() -> scannedComponents.stream()
+                    .filter(target::isAssignableFrom)
+                    .findAny()
+                    .orElseThrow(() ->
+                        new InvalidDependencyException("Could not resolve matching dependency of %s with qualifying name %s."
+                        .formatted(target.getName(), qualifyingName))
+                    ));
         }
 
         return target;
-    }
-
-    private String qualifyingName(final Class<?> target) {
-        String qualifyingName = target.getAnnotation(Component.class).value();
-        // TODO delegate naming
-        if (qualifyingName.isBlank()) {
-            qualifyingName = target.getSimpleName();
-            char[] nameChars = qualifyingName.toCharArray();
-            nameChars[0] = Character.toLowerCase(nameChars[0]);
-            qualifyingName = new String(nameChars);
-        }
-
-        return qualifyingName;
     }
 }

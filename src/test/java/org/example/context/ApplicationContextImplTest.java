@@ -80,7 +80,7 @@ class ApplicationContextImplTest {
         void shouldResolveClassToInitialize() {
             applicationContext.getInstance(Integer.class);
 
-            verify(componentResolver).resolve(Integer.class);
+            verify(componentResolver).resolve(Integer.class, "integer");
         }
 
         @Test

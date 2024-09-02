@@ -1,36 +1,34 @@
 package org.example.context;
 
-import org.example.annotation.Component;
 import org.example.exception.CircularDependencyException;
-import org.example.exception.InvalidDependencyException;
 import org.example.factory.ComponentFactory;
 import org.example.factory.ComponentResolver;
+import org.example.naming.QualifyingNameResolver;
 import org.example.registry.Registry;
 
 import java.util.Optional;
-import java.util.Set;
 
 public class ApplicationContextImpl implements ApplicationContext {
 
     private final Registry registry;
     private final ComponentFactory componentFactory;
     private final ComponentResolver componentResolver;
-    private final Set<Class<?>> scannedComponents;
+    private final QualifyingNameResolver nameResolver;
 
     public ApplicationContextImpl(final Registry registry,
                                   final ComponentFactory componentFactory,
                                   final ComponentResolver componentResolver,
-                                  final Set<Class<?>> scannedComponents) {
+                                  final QualifyingNameResolver nameResolver) {
 
         this.registry = registry;
         this.componentFactory = componentFactory;
         this.componentResolver = componentResolver;
-        this.scannedComponents = scannedComponents;
+        this.nameResolver = nameResolver;
     }
 
     @Override
     public <T> T getInstance(final Class<?> target) {
-        return getInstance(target, qualifyingName(target));
+        return getInstance(target, nameResolver.resolveFor(target));
     }
 
     @Override
@@ -41,12 +39,8 @@ public class ApplicationContextImpl implements ApplicationContext {
         }
 
         final Class<?> targetClass = componentResolver.resolve(target, qualifyingName);
-        if (!scannedComponents.contains(targetClass)) {
-            throw new InvalidDependencyException();
-        }
-
         if (registry.isProcessing(targetClass)) {
-            throw new CircularDependencyException();
+            throw new CircularDependencyException("Component %s is already processing.".formatted(target.getName()));
         }
 
         registry.process(targetClass);
@@ -59,18 +53,5 @@ public class ApplicationContextImpl implements ApplicationContext {
         }
 
         return (T) instance.get();
-    }
-
-    private String qualifyingName(final Class<?> target) {
-        String qualifyingName = target.getAnnotation(Component.class).value();
-        // TODO delegate naming
-        if (qualifyingName.isBlank()) {
-            qualifyingName = target.getSimpleName();
-            char[] nameChars = qualifyingName.toCharArray();
-            nameChars[0] = Character.toLowerCase(nameChars[0]);
-            qualifyingName = new String(nameChars);
-        }
-
-        return qualifyingName;
     }
 }

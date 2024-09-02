@@ -1,6 +1,6 @@
 package org.example.registry;
 
-import org.example.annotation.Component;
+import org.example.naming.QualifyingNameResolver;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -9,15 +9,18 @@ import java.util.Optional;
 public class MultiComponentRegistry implements Registry {
 
     private final Map<Class<?>, Map<String, Instance>> registry;
+    private final QualifyingNameResolver nameResolver;
 
-    public MultiComponentRegistry(final Map<Class<?>, Map<String, Instance>> registry) {
+    public MultiComponentRegistry(final Map<Class<?>, Map<String, Instance>> registry,
+                                  final QualifyingNameResolver nameResolver) {
 
         this.registry = registry;
+        this.nameResolver = nameResolver;
     }
 
     @Override
     public void process(final Class<?> target) {
-        final String qualifyingName = qualifyingName(target);
+        final String qualifyingName = nameResolver.resolveFor(target);
         if (!registry.containsKey(target)) {
             registry.put(target, new HashMap<>());
         }
@@ -27,7 +30,7 @@ public class MultiComponentRegistry implements Registry {
 
     @Override
     public void insert(final Class<?> target, final Object instance) {
-        final String qualifyingName = qualifyingName(target);
+        final String qualifyingName = nameResolver.resolveFor(target);
         if (!registry.containsKey(target)) {
             registry.put(target, new HashMap<>());
         }
@@ -49,25 +52,12 @@ public class MultiComponentRegistry implements Registry {
     }
 
     private Optional<Instance> getWrappedInstance(final Class<?> target) {
-        final String qualifyingName = qualifyingName(target);
+        final String qualifyingName = nameResolver.resolveFor(target);
 
         return registry.keySet().stream()
             .filter(target::isAssignableFrom)
             .findAny()
             .map(registry::get)
             .map(a -> a.get(qualifyingName));
-    }
-
-    private String qualifyingName(final Class<?> target) {
-        String qualifyingName = target.getAnnotation(Component.class).value();
-        // TODO delegate naming
-        if (qualifyingName.isBlank()) {
-            qualifyingName = target.getSimpleName();
-            char[] nameChars = qualifyingName.toCharArray();
-            nameChars[0] = Character.toLowerCase(nameChars[0]);
-            qualifyingName = new String(nameChars);
-        }
-
-        return qualifyingName;
     }
 }
