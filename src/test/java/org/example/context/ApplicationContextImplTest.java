@@ -3,7 +3,7 @@ package org.example.context;
 import org.example.exception.CircularDependencyException;
 import org.example.factory.ComponentFactory;
 import org.example.factory.ComponentResolver;
-import org.example.naming.QualifyingNameResolver;
+import org.example.naming.QualifierResolver;
 import org.example.registry.Registry;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -33,7 +33,7 @@ class ApplicationContextImplTest {
     @Mock
     private ComponentResolver componentResolver;
     @Mock
-    private QualifyingNameResolver nameResolver;
+    private QualifierResolver nameResolver;
     @Mock
     private Object instance;
     @InjectMocks
@@ -68,11 +68,11 @@ class ApplicationContextImplTest {
         void shouldResolveName() {
             applicationContext.getInstance(Object.class);
 
-            verify(nameResolver).resolveFor(Object.class);
+            verify(nameResolver).resolve(Object.class);
         }
         @Test
         void shouldResolveClassToInitialize() {
-            when(nameResolver.resolveFor(any())).thenReturn("integer");
+            when(nameResolver.resolve(any())).thenReturn("integer");
 
             applicationContext.getInstance(Integer.class);
 

@@ -1,6 +1,6 @@
 package org.example.factory;
 
-import org.example.naming.QualifyingNameResolver;
+import org.example.naming.QualifierResolver;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -14,7 +14,7 @@ class AssignableComponentResolverTest {
     @Mock
     private Set<Class<?>> scannedComponents;
     @Mock
-    private QualifyingNameResolver nameResolver;
+    private QualifierResolver nameResolver;
     @InjectMocks
     private AssignableComponentResolver componentResolver;
 }

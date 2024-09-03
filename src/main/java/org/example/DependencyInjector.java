@@ -7,8 +7,10 @@ import org.example.context.ApplicationContextImpl;
 import org.example.factory.AssignableComponentResolver;
 import org.example.factory.ComponentFactoryImpl;
 import org.example.naming.AnnotationBasedConstructorParameterNameResolver;
-import org.example.naming.AnnotationBasedNameResolver;
-import org.example.naming.QualifyingNameResolver;
+import org.example.naming.AnnotationBasedQualifierResolver;
+import org.example.naming.ClassBasedQualifierResolver;
+import org.example.naming.QualifierResolver;
+import org.example.naming.QualifierValidator;
 import org.example.registry.SimpleRegistry;
 import org.example.registry.ImmutableInstanceFactory;
 import org.example.scan.AnnotationPresentPredicate;
@@ -30,13 +32,13 @@ public class DependencyInjector {
         final ClassScanner classScanner = new ClasspathClassScanner(new ContentFactoryImpl(), new SystemClassLoaderResourceLocator(), new URIFileFactory());
         final AnnotationScanner annotationScanner = new GenericAnnotationScanner(classScanner, new AnnotationPresentPredicate(Component.class));
         final Set<Class<?>> scannedComponents = annotationScanner.getAnnotatedClasses(rootPackage);
-        final QualifyingNameResolver qualifyingNameResolver = new AnnotationBasedNameResolver();
+        final QualifierResolver qualifierResolver = new AnnotationBasedQualifierResolver(new ClassBasedQualifierResolver(), new QualifierValidator());
 
         return new ApplicationContextImpl(
             new SimpleRegistry(new HashMap<>(), new ImmutableInstanceFactory()),
-            new ComponentFactoryImpl(new AnnotationBasedConstructorParameterNameResolver(qualifyingNameResolver, scannedComponents)),
-            new AssignableComponentResolver(scannedComponents, qualifyingNameResolver),
-            qualifyingNameResolver
+            new ComponentFactoryImpl(new AnnotationBasedConstructorParameterNameResolver(qualifierResolver, scannedComponents)),
+            new AssignableComponentResolver(scannedComponents, qualifierResolver),
+            qualifierResolver
         );
     }
 }

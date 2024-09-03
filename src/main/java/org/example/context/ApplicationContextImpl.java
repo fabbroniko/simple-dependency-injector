@@ -3,7 +3,7 @@ package org.example.context;
 import org.example.exception.CircularDependencyException;
 import org.example.factory.ComponentFactory;
 import org.example.factory.ComponentResolver;
-import org.example.naming.QualifyingNameResolver;
+import org.example.naming.QualifierResolver;
 import org.example.registry.Registry;
 
 import java.util.Optional;
@@ -13,12 +13,12 @@ public class ApplicationContextImpl implements ApplicationContext {
     private final Registry registry;
     private final ComponentFactory componentFactory;
     private final ComponentResolver componentResolver;
-    private final QualifyingNameResolver nameResolver;
+    private final QualifierResolver nameResolver;
 
     public ApplicationContextImpl(final Registry registry,
                                   final ComponentFactory componentFactory,
                                   final ComponentResolver componentResolver,
-                                  final QualifyingNameResolver nameResolver) {
+                                  final QualifierResolver nameResolver) {
 
         this.registry = registry;
         this.componentFactory = componentFactory;
@@ -28,7 +28,7 @@ public class ApplicationContextImpl implements ApplicationContext {
 
     @Override
     public <T> T getInstance(final Class<?> target) {
-        return getInstance(target, nameResolver.resolveFor(target));
+        return getInstance(target, nameResolver.resolve(target));
     }
 
     @Override

@@ -10,10 +10,10 @@ import java.util.Set;
 
 public class AnnotationBasedConstructorParameterNameResolver implements ConstructorParameterNameResolver {
 
-    private final QualifyingNameResolver classBasedNameResolver;
+    private final QualifierResolver classBasedNameResolver;
     private final Set<Class<?>> scannedComponents;
 
-    public AnnotationBasedConstructorParameterNameResolver(final QualifyingNameResolver classBasedNameResolver,
+    public AnnotationBasedConstructorParameterNameResolver(final QualifierResolver classBasedNameResolver,
                                                            final Set<Class<?>> scannedComponents) {
         this.classBasedNameResolver = classBasedNameResolver;
         this.scannedComponents = scannedComponents;
@@ -37,6 +37,6 @@ public class AnnotationBasedConstructorParameterNameResolver implements Construc
                 .formatted(target.getName(), constructorParameter.getDeclaringExecutable()));
         }
 
-        return classBasedNameResolver.resolveFor(matchingClasses.stream().findFirst().orElseThrow());
+        return classBasedNameResolver.resolve(matchingClasses.stream().findFirst().orElseThrow());
     }
 }
