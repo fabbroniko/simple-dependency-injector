@@ -3,7 +3,7 @@ package org.example.context;
 import org.example.exception.CircularDependencyException;
 import org.example.factory.ComponentFactory;
 import org.example.factory.ComponentResolver;
-import org.example.naming.QualifyingNameResolver;
+import org.example.naming.QualifierResolver;
 import org.example.registry.Registry;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -14,7 +14,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Optional;
-import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -34,9 +33,7 @@ class ApplicationContextImplTest {
     @Mock
     private ComponentResolver componentResolver;
     @Mock
-    private QualifyingNameResolver nameResolver;
-    @Mock
-    private Set<Class<?>> scannedComponents;
+    private QualifierResolver<Class<?>> nameResolver;
     @Mock
     private Object instance;
     @InjectMocks
@@ -71,22 +68,15 @@ class ApplicationContextImplTest {
         void shouldResolveName() {
             applicationContext.getInstance(Object.class);
 
-            verify(nameResolver).resolveFor(Object.class);
+            verify(nameResolver).resolve(Object.class);
         }
         @Test
         void shouldResolveClassToInitialize() {
-            when(nameResolver.resolveFor(any())).thenReturn("integer");
+            when(nameResolver.resolve(any())).thenReturn("integer");
 
             applicationContext.getInstance(Integer.class);
 
             verify(componentResolver).resolve(Integer.class, "integer");
-        }
-
-        @Test
-        void shouldRegisterTargetAsProcessing() {
-            applicationContext.getInstance(Integer.class);
-
-            verify(registry).process(Object.class);
         }
 
         @Test
@@ -107,6 +97,15 @@ class ApplicationContextImplTest {
         void shouldReturnValue() {
             assertThat((Object) applicationContext.getInstance(Integer.class))
                 .isEqualTo(instance);
+        }
+
+        @Test
+        void shouldRegisterTargetAsProcessing() {
+            when(registry.getInstance(any())).thenReturn(Optional.empty());
+
+            applicationContext.getInstance(Integer.class);
+
+            verify(registry).process(Object.class);
         }
 
         @Test

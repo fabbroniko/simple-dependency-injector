@@ -1,17 +1,17 @@
 package org.example.factory;
 
 import org.example.exception.InvalidDependencyException;
-import org.example.naming.QualifyingNameResolver;
+import org.example.naming.QualifierResolver;
 
 import java.util.Set;
 
 public class AssignableComponentResolver implements ComponentResolver {
 
     private final Set<Class<?>> scannedComponents;
-    private final QualifyingNameResolver nameResolver;
+    private final QualifierResolver<Class<?>> nameResolver;
 
     public AssignableComponentResolver(final Set<Class<?>> scannedComponents,
-                                       final QualifyingNameResolver nameResolver) {
+                                       final QualifierResolver<Class<?>> nameResolver) {
         this.scannedComponents = scannedComponents;
         this.nameResolver = nameResolver;
     }
@@ -21,7 +21,7 @@ public class AssignableComponentResolver implements ComponentResolver {
         if (target.isInterface()) {
             return scannedComponents.stream()
                 .filter(target::isAssignableFrom)
-                .filter(component -> nameResolver.resolveFor(component).equals(qualifyingName))
+                .filter(component -> nameResolver.resolve(component).equals(qualifyingName))
                 .findAny().orElseGet(() -> scannedComponents.stream()
                     .filter(target::isAssignableFrom)
                     .findAny()

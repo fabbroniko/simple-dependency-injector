@@ -6,11 +6,14 @@ import org.example.context.ApplicationContext;
 import org.example.context.ApplicationContextImpl;
 import org.example.factory.AssignableComponentResolver;
 import org.example.factory.ComponentFactoryImpl;
-import org.example.naming.AnnotationBasedConstructorParameterNameResolver;
-import org.example.naming.AnnotationBasedNameResolver;
-import org.example.naming.QualifyingNameResolver;
-import org.example.registry.AssignableRegistry;
-import org.example.registry.InstanceStoreFactory;
+import org.example.naming.AnnotatedConstructorParameterQualifierResolver;
+import org.example.naming.AnnotationBasedQualifierResolver;
+import org.example.naming.ClassBasedQualifierResolver;
+import org.example.naming.ConstructorParameterQualifierResolver;
+import org.example.naming.QualifierResolver;
+import org.example.naming.QualifierValidator;
+import org.example.registry.SimpleRegistry;
+import org.example.registry.ImmutableInstanceFactory;
 import org.example.scan.AnnotationPresentPredicate;
 import org.example.scan.AnnotationScanner;
 import org.example.scan.ClassScanner;
@@ -20,6 +23,7 @@ import org.example.scan.GenericAnnotationScanner;
 import org.example.scan.SystemClassLoaderResourceLocator;
 import org.example.scan.URIFileFactory;
 
+import java.lang.reflect.Parameter;
 import java.util.HashMap;
 import java.util.Set;
 
@@ -30,13 +34,14 @@ public class DependencyInjector {
         final ClassScanner classScanner = new ClasspathClassScanner(new ContentFactoryImpl(), new SystemClassLoaderResourceLocator(), new URIFileFactory());
         final AnnotationScanner annotationScanner = new GenericAnnotationScanner(classScanner, new AnnotationPresentPredicate(Component.class));
         final Set<Class<?>> scannedComponents = annotationScanner.getAnnotatedClasses(rootPackage);
-        final QualifyingNameResolver qualifyingNameResolver = new AnnotationBasedNameResolver();
+        final QualifierResolver<Class<?>> qualifierResolver = new AnnotationBasedQualifierResolver(new ClassBasedQualifierResolver(), new QualifierValidator());
+        final QualifierResolver<Parameter> constructorResolver = new AnnotatedConstructorParameterQualifierResolver(new ConstructorParameterQualifierResolver(qualifierResolver, scannedComponents));
 
         return new ApplicationContextImpl(
-            new AssignableRegistry(new HashMap<>(), new InstanceStoreFactory()),
-            new ComponentFactoryImpl(new AnnotationBasedConstructorParameterNameResolver(qualifyingNameResolver, scannedComponents)),
-            new AssignableComponentResolver(scannedComponents, qualifyingNameResolver),
-            qualifyingNameResolver
+            new SimpleRegistry(new HashMap<>(), new ImmutableInstanceFactory()),
+            new ComponentFactoryImpl(constructorResolver),
+            new AssignableComponentResolver(scannedComponents, qualifierResolver),
+            qualifierResolver
         );
     }
 }
