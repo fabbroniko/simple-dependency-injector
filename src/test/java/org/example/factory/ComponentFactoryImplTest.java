@@ -12,6 +12,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.lang.reflect.Parameter;
 import java.util.Map;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -31,7 +32,7 @@ class ComponentFactoryImplTest {
     @Mock
     private ApplicationContext applicationContext;
     @Mock
-    private Object firstArgument;
+    private Set<Object> firstArgument;
     @Mock
     private Map<String, String> secondArgument;
     @InjectMocks
@@ -39,7 +40,7 @@ class ComponentFactoryImplTest {
 
     @BeforeEach
     void setUp() {
-        when(applicationContext.getInstance(eq(Object.class), anyString())).thenReturn(firstArgument);
+        when(applicationContext.getInstance(eq(Set.class), anyString())).thenReturn(firstArgument);
         when(applicationContext.getInstance(eq(Map.class), anyString())).thenReturn(secondArgument);
     }
 
@@ -53,7 +54,7 @@ class ComponentFactoryImplTest {
 
     @Test
     void shouldResolveNameFirstParameter() {
-        when(nameResolver.resolve(any())).thenReturn("objectType").thenReturn("mapType");
+        when(nameResolver.resolve(any())).thenReturn("setType").thenReturn("mapType");
 
         componentFactory.create(WithConstructor.class, applicationContext);
 
@@ -62,16 +63,16 @@ class ComponentFactoryImplTest {
 
     @Test
     void shouldGetFirstConstructorArgumentFromContext() {
-        when(nameResolver.resolve(any())).thenReturn("objectType").thenReturn("mapType");
+        when(nameResolver.resolve(any())).thenReturn("setType").thenReturn("mapType");
 
         componentFactory.create(WithConstructor.class, applicationContext);
 
-        verify(applicationContext).getInstance(Object.class, "objectType");
+        verify(applicationContext).getInstance(Set.class, "setType");
     }
 
     @Test
     void shouldGetSecondConstructorArgumentFromContext() {
-        when(nameResolver.resolve(any())).thenReturn("objectType").thenReturn("mapType");
+        when(nameResolver.resolve(any())).thenReturn("setType").thenReturn("mapType");
 
         componentFactory.create(WithConstructor.class, applicationContext);
 
@@ -80,7 +81,7 @@ class ComponentFactoryImplTest {
 
     @Test
     void shouldReturnConstructedObject() {
-        when(nameResolver.resolve(any())).thenReturn("objectType").thenReturn("mapType");
+        when(nameResolver.resolve(any())).thenReturn("setType").thenReturn("mapType");
 
         assertThat(componentFactory.create(WithConstructor.class, applicationContext))
             .isInstanceOf(WithConstructor.class);
@@ -93,6 +94,6 @@ class ComponentFactoryImplTest {
 
     private static class WithConstructor {
 
-        public WithConstructor(final Object firstArgument, final Map<String, String> secondArgument) {}
+        public WithConstructor(final Set<Object> firstArgument, final Map<String, String> secondArgument) {}
     }
 }

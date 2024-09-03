@@ -12,10 +12,10 @@ import static java.util.Arrays.stream;
 
 public class ComponentFactoryImpl implements ComponentFactory {
 
-    private final QualifierResolver<Parameter> constructorParameterNameResolver;
+    private final QualifierResolver<Parameter> nameResolver;
 
-    public ComponentFactoryImpl(final QualifierResolver<Parameter> constructorParameterNameResolver) {
-        this.constructorParameterNameResolver = constructorParameterNameResolver;
+    public ComponentFactoryImpl(final QualifierResolver<Parameter> nameResolver) {
+        this.nameResolver = nameResolver;
     }
 
     @Override
@@ -26,7 +26,7 @@ public class ComponentFactoryImpl implements ComponentFactory {
 
         final Parameter[] params = constructor.getParameters();
         final List<Object> vals = stream(params)
-                .map(parameter -> context.getInstance(parameter.getType(), constructorParameterNameResolver.resolve(parameter)))
+                .map(parameter -> parameterToInstance(parameter, context))
                 .toList();
 
         try {
@@ -34,5 +34,13 @@ public class ComponentFactoryImpl implements ComponentFactory {
         } catch (final Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private Object parameterToInstance(final Parameter parameter, final ApplicationContext context) {
+        if(parameter.getType().isAssignableFrom(ApplicationContext.class)) {
+            return context.getInstance(ApplicationContext.class);
+        }
+
+        return context.getInstance(parameter.getType(), nameResolver.resolve(parameter));
     }
 }

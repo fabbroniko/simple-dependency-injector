@@ -9,6 +9,7 @@ import org.example.factory.ComponentFactoryImpl;
 import org.example.naming.AnnotatedConstructorParameterQualifierResolver;
 import org.example.naming.AnnotationBasedQualifierResolver;
 import org.example.naming.ClassBasedQualifierResolver;
+import org.example.naming.ConstructorParameterQualifierResolver;
 import org.example.naming.QualifierResolver;
 import org.example.naming.QualifierValidator;
 import org.example.registry.SimpleRegistry;
@@ -22,6 +23,7 @@ import org.example.scan.GenericAnnotationScanner;
 import org.example.scan.SystemClassLoaderResourceLocator;
 import org.example.scan.URIFileFactory;
 
+import java.lang.reflect.Parameter;
 import java.util.HashMap;
 import java.util.Set;
 
@@ -33,10 +35,11 @@ public class DependencyInjector {
         final AnnotationScanner annotationScanner = new GenericAnnotationScanner(classScanner, new AnnotationPresentPredicate(Component.class));
         final Set<Class<?>> scannedComponents = annotationScanner.getAnnotatedClasses(rootPackage);
         final QualifierResolver<Class<?>> qualifierResolver = new AnnotationBasedQualifierResolver(new ClassBasedQualifierResolver(), new QualifierValidator());
+        final QualifierResolver<Parameter> constructorResolver = new AnnotatedConstructorParameterQualifierResolver(new ConstructorParameterQualifierResolver(qualifierResolver, scannedComponents));
 
         return new ApplicationContextImpl(
             new SimpleRegistry(new HashMap<>(), new ImmutableInstanceFactory()),
-            new ComponentFactoryImpl(new AnnotatedConstructorParameterQualifierResolver(qualifierResolver, scannedComponents)),
+            new ComponentFactoryImpl(constructorResolver),
             new AssignableComponentResolver(scannedComponents, qualifierResolver),
             qualifierResolver
         );
