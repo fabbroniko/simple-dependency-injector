@@ -7,11 +7,11 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -51,8 +51,8 @@ class AssignableRegistryTest {
     class GetInstanceTest {
 
         @Test
-        void shouldGetInstanceOfSameClass() {
-            when(registry.keySet()).thenReturn(Set.of(Object.class));
+        void shouldGetValueFromRegistry() {
+            doReturn(instance).when(registry).get(any(Class.class));
 
             assignableRegistry.getInstance(Object.class);
 
@@ -60,27 +60,8 @@ class AssignableRegistryTest {
         }
 
         @Test
-        void shouldGetInstanceOfSuperClass() {
-            when(registry.keySet()).thenReturn(Set.of(Integer.class));
-
-            assignableRegistry.getInstance(Object.class);
-
-            verify(registry).get(Integer.class);
-        }
-
-        @Test
-        void shouldGetInstanceOfInterface() {
-            when(registry.keySet()).thenReturn(Set.of(HashMap.class));
-
-            assignableRegistry.getInstance(Map.class);
-
-            verify(registry).get(HashMap.class);
-        }
-
-        @Test
         void shouldReturnInstanceFromRegistry() {
-            when(registry.keySet()).thenReturn(Set.of(Object.class));
-            when(registry.get(Object.class)).thenReturn(instance);
+            doReturn(instance).when(registry).get(any(Class.class));
             when(instance.instance()).thenReturn(actualInstance);
 
             assertThat(assignableRegistry.getInstance(Object.class))
@@ -92,8 +73,8 @@ class AssignableRegistryTest {
     class IsProcessingTest {
 
         @Test
-        void shouldGetInstanceOfSameClass() {
-            when(registry.keySet()).thenReturn(Set.of(Object.class));
+        void shouldGetValueFromRegistry() {
+            doReturn(instance).when(registry).get(any(Class.class));
 
             assignableRegistry.isProcessing(Object.class);
 
@@ -101,27 +82,8 @@ class AssignableRegistryTest {
         }
 
         @Test
-        void shouldGetInstanceOfSuperClass() {
-            when(registry.keySet()).thenReturn(Set.of(Integer.class));
-
-            assignableRegistry.isProcessing(Object.class);
-
-            verify(registry).get(Integer.class);
-        }
-
-        @Test
-        void shouldGetInstanceOfInterface() {
-            when(registry.keySet()).thenReturn(Set.of(HashMap.class));
-
-            assignableRegistry.isProcessing(Map.class);
-
-            verify(registry).get(HashMap.class);
-        }
-
-        @Test
         void shouldGetInstanceState() {
-            when(registry.keySet()).thenReturn(Set.of(Object.class));
-            when(registry.get(Object.class)).thenReturn(instance);
+            doReturn(instance).when(registry).get(any(Class.class));
 
             assignableRegistry.isProcessing(Object.class);
 
@@ -130,8 +92,7 @@ class AssignableRegistryTest {
 
         @Test
         void shouldReturnFalseWhenNotProcessing() {
-            when(registry.keySet()).thenReturn(Set.of(Object.class));
-            when(registry.get(Object.class)).thenReturn(instance);
+            doReturn(instance).when(registry).get(any(Class.class));
             when(instance.state()).thenReturn(State.COMPLETE);
 
             assertThat(assignableRegistry.isProcessing(Object.class))
@@ -140,12 +101,11 @@ class AssignableRegistryTest {
 
         @Test
         void shouldReturnTrueWhenProcessing() {
-            when(registry.keySet()).thenReturn(Set.of(Object.class));
-            when(registry.get(Object.class)).thenReturn(instance);
-            when(instance.state()).thenReturn(State.COMPLETE);
+            doReturn(instance).when(registry).get(any(Class.class));
+            when(instance.state()).thenReturn(State.PROCESSING);
 
             assertThat(assignableRegistry.isProcessing(Object.class))
-                .isFalse();
+                .isTrue();
         }
     }
 }

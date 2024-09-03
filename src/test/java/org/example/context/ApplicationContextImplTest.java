@@ -14,7 +14,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Optional;
-import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -35,8 +34,6 @@ class ApplicationContextImplTest {
     private ComponentResolver componentResolver;
     @Mock
     private QualifyingNameResolver nameResolver;
-    @Mock
-    private Set<Class<?>> scannedComponents;
     @Mock
     private Object instance;
     @InjectMocks
@@ -83,13 +80,6 @@ class ApplicationContextImplTest {
         }
 
         @Test
-        void shouldRegisterTargetAsProcessing() {
-            applicationContext.getInstance(Integer.class);
-
-            verify(registry).process(Object.class);
-        }
-
-        @Test
         void shouldGetInstanceFromRegistry() {
             applicationContext.getInstance(Integer.class);
 
@@ -107,6 +97,15 @@ class ApplicationContextImplTest {
         void shouldReturnValue() {
             assertThat((Object) applicationContext.getInstance(Integer.class))
                 .isEqualTo(instance);
+        }
+
+        @Test
+        void shouldRegisterTargetAsProcessing() {
+            when(registry.getInstance(any())).thenReturn(Optional.empty());
+
+            applicationContext.getInstance(Integer.class);
+
+            verify(registry).process(Object.class);
         }
 
         @Test

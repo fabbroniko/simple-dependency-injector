@@ -27,21 +27,15 @@ public class AssignableRegistry implements Registry {
 
     @Override
     public Optional<Object> getInstance(final Class<?> target) {
-        return getWrappedInstance(target)
+        return Optional.ofNullable(registry.get(target))
+            .filter(instance -> State.COMPLETE.equals(instance.state()))
             .map(Instance::instance);
     }
 
     @Override
     public boolean isProcessing(final Class<?> target) {
-        return getWrappedInstance(target)
+        return Optional.ofNullable(registry.get(target))
             .map(Instance::state).stream()
             .anyMatch(State.PROCESSING::equals);
-    }
-
-    private Optional<Instance> getWrappedInstance(final Class<?> target) {
-        return registry.keySet().stream()
-            .filter(target::isAssignableFrom)
-            .findAny()
-            .map(registry::get);
     }
 }

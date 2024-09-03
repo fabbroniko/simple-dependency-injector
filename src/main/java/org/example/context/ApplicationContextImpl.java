@@ -43,10 +43,14 @@ public class ApplicationContextImpl implements ApplicationContext {
             throw new CircularDependencyException("Component %s is already processing.".formatted(target.getName()));
         }
 
-        registry.process(targetClass);
+        final Optional<Object> registeredInstance = registry.getInstance(targetClass);
+        if(registeredInstance.isPresent()) {
+            return (T) registeredInstance.get();
+        }
 
         final Optional<Object> instance = registry.getInstance(targetClass);
         if(instance.isEmpty()) {
+            registry.process(targetClass);
             final Object createdInstance = componentFactory.create(targetClass, this);
             registry.insert(targetClass, createdInstance);
             return (T) createdInstance;
