@@ -3,13 +3,13 @@ package org.example.registry;
 import java.util.Map;
 import java.util.Optional;
 
-public class AssignableRegistry implements Registry {
+public class SimpleRegistry implements Registry {
 
     private final Map<Class<?>, Instance> registry;
     private final InstanceFactory instanceFactory;
 
-    public AssignableRegistry(final Map<Class<?>, Instance> registry,
-                              final InstanceFactory instanceFactory) {
+    public SimpleRegistry(final Map<Class<?>, Instance> registry,
+                          final InstanceFactory instanceFactory) {
 
         this.registry = registry;
         this.instanceFactory = instanceFactory;

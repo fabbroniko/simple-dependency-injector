@@ -16,7 +16,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-class AssignableRegistryTest {
+class SimpleRegistryTest {
 
     @Mock
     private Map<Class<?>, Instance> registry;
@@ -27,13 +27,13 @@ class AssignableRegistryTest {
     @Mock
     private Object actualInstance;
     @InjectMocks
-    private AssignableRegistry assignableRegistry;
+    private SimpleRegistry simpleRegistry;
 
     @Test
     void shouldPutProcessingInstanceInRegistry() {
         when(instanceFactory.createProcessing()).thenReturn(instance);
 
-        assignableRegistry.process(Object.class);
+        simpleRegistry.process(Object.class);
 
         verify(registry).put(Object.class, instance);
     }
@@ -42,7 +42,7 @@ class AssignableRegistryTest {
     void shouldPutCompletedInstanceInRegistry() {
         when(instanceFactory.createCompleted(actualInstance)).thenReturn(instance);
 
-        assignableRegistry.insert(Object.class, actualInstance);
+        simpleRegistry.insert(Object.class, actualInstance);
 
         verify(registry).put(Object.class, instance);
     }
@@ -54,7 +54,7 @@ class AssignableRegistryTest {
         void shouldGetValueFromRegistry() {
             doReturn(instance).when(registry).get(any(Class.class));
 
-            assignableRegistry.getInstance(Object.class);
+            simpleRegistry.getInstance(Object.class);
 
             verify(registry).get(Object.class);
         }
@@ -63,8 +63,9 @@ class AssignableRegistryTest {
         void shouldReturnInstanceFromRegistry() {
             doReturn(instance).when(registry).get(any(Class.class));
             when(instance.instance()).thenReturn(actualInstance);
+            when(instance.state()).thenReturn(State.COMPLETE);
 
-            assertThat(assignableRegistry.getInstance(Object.class))
+            assertThat(simpleRegistry.getInstance(Object.class))
                 .contains(actualInstance);
         }
     }
@@ -76,7 +77,7 @@ class AssignableRegistryTest {
         void shouldGetValueFromRegistry() {
             doReturn(instance).when(registry).get(any(Class.class));
 
-            assignableRegistry.isProcessing(Object.class);
+            simpleRegistry.isProcessing(Object.class);
 
             verify(registry).get(Object.class);
         }
@@ -85,7 +86,7 @@ class AssignableRegistryTest {
         void shouldGetInstanceState() {
             doReturn(instance).when(registry).get(any(Class.class));
 
-            assignableRegistry.isProcessing(Object.class);
+            simpleRegistry.isProcessing(Object.class);
 
             verify(instance).state();
         }
@@ -95,7 +96,7 @@ class AssignableRegistryTest {
             doReturn(instance).when(registry).get(any(Class.class));
             when(instance.state()).thenReturn(State.COMPLETE);
 
-            assertThat(assignableRegistry.isProcessing(Object.class))
+            assertThat(simpleRegistry.isProcessing(Object.class))
                 .isFalse();
         }
 
@@ -104,7 +105,7 @@ class AssignableRegistryTest {
             doReturn(instance).when(registry).get(any(Class.class));
             when(instance.state()).thenReturn(State.PROCESSING);
 
-            assertThat(assignableRegistry.isProcessing(Object.class))
+            assertThat(simpleRegistry.isProcessing(Object.class))
                 .isTrue();
         }
     }

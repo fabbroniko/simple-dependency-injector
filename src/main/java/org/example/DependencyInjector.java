@@ -9,8 +9,8 @@ import org.example.factory.ComponentFactoryImpl;
 import org.example.naming.AnnotationBasedConstructorParameterNameResolver;
 import org.example.naming.AnnotationBasedNameResolver;
 import org.example.naming.QualifyingNameResolver;
-import org.example.registry.AssignableRegistry;
-import org.example.registry.InstanceStoreFactory;
+import org.example.registry.SimpleRegistry;
+import org.example.registry.ImmutableInstanceFactory;
 import org.example.scan.AnnotationPresentPredicate;
 import org.example.scan.AnnotationScanner;
 import org.example.scan.ClassScanner;
@@ -33,7 +33,7 @@ public class DependencyInjector {
         final QualifyingNameResolver qualifyingNameResolver = new AnnotationBasedNameResolver();
 
         return new ApplicationContextImpl(
-            new AssignableRegistry(new HashMap<>(), new InstanceStoreFactory()),
+            new SimpleRegistry(new HashMap<>(), new ImmutableInstanceFactory()),
             new ComponentFactoryImpl(new AnnotationBasedConstructorParameterNameResolver(qualifyingNameResolver, scannedComponents)),
             new AssignableComponentResolver(scannedComponents, qualifyingNameResolver),
             qualifyingNameResolver
