@@ -1,6 +1,6 @@
 package org.example.naming;
 
-public class ClassBasedQualifierResolver implements QualifierResolver {
+public class ClassBasedQualifierResolver implements QualifierResolver<Class<?>> {
 
     @Override
     public String resolve(final Class<?> target) {

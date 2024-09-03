@@ -8,10 +8,10 @@ import java.util.Set;
 public class AssignableComponentResolver implements ComponentResolver {
 
     private final Set<Class<?>> scannedComponents;
-    private final QualifierResolver nameResolver;
+    private final QualifierResolver<Class<?>> nameResolver;
 
     public AssignableComponentResolver(final Set<Class<?>> scannedComponents,
-                                       final QualifierResolver nameResolver) {
+                                       final QualifierResolver<Class<?>> nameResolver) {
         this.scannedComponents = scannedComponents;
         this.nameResolver = nameResolver;
     }

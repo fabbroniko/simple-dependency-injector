@@ -13,12 +13,12 @@ public class ApplicationContextImpl implements ApplicationContext {
     private final Registry registry;
     private final ComponentFactory componentFactory;
     private final ComponentResolver componentResolver;
-    private final QualifierResolver nameResolver;
+    private final QualifierResolver<Class<?>> nameResolver;
 
     public ApplicationContextImpl(final Registry registry,
                                   final ComponentFactory componentFactory,
                                   final ComponentResolver componentResolver,
-                                  final QualifierResolver nameResolver) {
+                                  final QualifierResolver<Class<?>> nameResolver) {
 
         this.registry = registry;
         this.componentFactory = componentFactory;

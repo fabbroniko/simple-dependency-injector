@@ -33,7 +33,7 @@ class ApplicationContextImplTest {
     @Mock
     private ComponentResolver componentResolver;
     @Mock
-    private QualifierResolver nameResolver;
+    private QualifierResolver<Class<?>> nameResolver;
     @Mock
     private Object instance;
     @InjectMocks

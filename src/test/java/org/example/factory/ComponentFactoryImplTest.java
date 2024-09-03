@@ -2,7 +2,7 @@ package org.example.factory;
 
 import org.example.context.ApplicationContext;
 import org.example.exception.InvalidComponentConstructorException;
-import org.example.naming.ConstructorParameterNameResolver;
+import org.example.naming.QualifierResolver;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -10,6 +10,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.lang.reflect.Parameter;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -26,7 +27,7 @@ import static org.mockito.Mockito.when;
 class ComponentFactoryImplTest {
 
     @Mock
-    private ConstructorParameterNameResolver nameResolver;
+    private QualifierResolver<Parameter> nameResolver;
     @Mock
     private ApplicationContext applicationContext;
     @Mock
@@ -40,13 +41,11 @@ class ComponentFactoryImplTest {
     void setUp() {
         when(applicationContext.getInstance(eq(Object.class), anyString())).thenReturn(firstArgument);
         when(applicationContext.getInstance(eq(Map.class), anyString())).thenReturn(secondArgument);
-        when(nameResolver.resolve(any())).thenReturn("objectType").thenReturn("mapType");
     }
 
     @Test
     void shouldThrowExceptionIfSuitableConstructorNotFound() {
         reset(applicationContext);
-        reset(nameResolver);
 
         assertThatThrownBy(() -> componentFactory.create(ConstructorLess.class, applicationContext))
             .isInstanceOf(InvalidComponentConstructorException.class);
@@ -54,6 +53,8 @@ class ComponentFactoryImplTest {
 
     @Test
     void shouldResolveNameFirstParameter() {
+        when(nameResolver.resolve(any())).thenReturn("objectType").thenReturn("mapType");
+
         componentFactory.create(WithConstructor.class, applicationContext);
 
         verify(nameResolver, times(2)).resolve(any());
@@ -61,6 +62,8 @@ class ComponentFactoryImplTest {
 
     @Test
     void shouldGetFirstConstructorArgumentFromContext() {
+        when(nameResolver.resolve(any())).thenReturn("objectType").thenReturn("mapType");
+
         componentFactory.create(WithConstructor.class, applicationContext);
 
         verify(applicationContext).getInstance(Object.class, "objectType");
@@ -68,6 +71,8 @@ class ComponentFactoryImplTest {
 
     @Test
     void shouldGetSecondConstructorArgumentFromContext() {
+        when(nameResolver.resolve(any())).thenReturn("objectType").thenReturn("mapType");
+
         componentFactory.create(WithConstructor.class, applicationContext);
 
         verify(applicationContext).getInstance(Map.class, "mapType");
@@ -75,6 +80,8 @@ class ComponentFactoryImplTest {
 
     @Test
     void shouldReturnConstructedObject() {
+        when(nameResolver.resolve(any())).thenReturn("objectType").thenReturn("mapType");
+
         assertThat(componentFactory.create(WithConstructor.class, applicationContext))
             .isInstanceOf(WithConstructor.class);
     }

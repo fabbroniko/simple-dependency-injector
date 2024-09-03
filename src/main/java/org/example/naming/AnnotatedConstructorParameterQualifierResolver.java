@@ -8,13 +8,13 @@ import java.lang.reflect.Parameter;
 import java.util.List;
 import java.util.Set;
 
-public class AnnotationBasedConstructorParameterNameResolver implements ConstructorParameterNameResolver {
+public class AnnotatedConstructorParameterQualifierResolver implements QualifierResolver<Parameter> {
 
-    private final QualifierResolver classBasedNameResolver;
+    private final QualifierResolver<Class<?>> classBasedNameResolver;
     private final Set<Class<?>> scannedComponents;
 
-    public AnnotationBasedConstructorParameterNameResolver(final QualifierResolver classBasedNameResolver,
-                                                           final Set<Class<?>> scannedComponents) {
+    public AnnotatedConstructorParameterQualifierResolver(final QualifierResolver<Class<?>> classBasedNameResolver,
+                                                          final Set<Class<?>> scannedComponents) {
         this.classBasedNameResolver = classBasedNameResolver;
         this.scannedComponents = scannedComponents;
     }

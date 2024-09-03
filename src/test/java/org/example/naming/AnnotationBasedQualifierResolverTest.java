@@ -18,7 +18,7 @@ import static org.mockito.Mockito.when;
 class AnnotationBasedQualifierResolverTest {
 
     @Mock
-    private QualifierResolver alternateResolver;
+    private QualifierResolver<Class<?>> alternateResolver;
     @Mock
     private Validator validator;
     @InjectMocks

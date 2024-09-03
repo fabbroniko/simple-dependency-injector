@@ -1,6 +1,6 @@
 package org.example.naming;
 
-public interface QualifierResolver {
+public interface QualifierResolver<T> {
 
-    String resolve(final Class<?> target);
+    String resolve(final T target);
 }

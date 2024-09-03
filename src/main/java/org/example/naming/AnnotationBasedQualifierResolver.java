@@ -2,12 +2,12 @@ package org.example.naming;
 
 import org.example.annotation.Component;
 
-public class AnnotationBasedQualifierResolver implements QualifierResolver {
+public class AnnotationBasedQualifierResolver implements QualifierResolver<Class<?>> {
 
-    private final QualifierResolver alternateResolver;
+    private final QualifierResolver<Class<?>> alternateResolver;
     private final Validator validator;
 
-    public AnnotationBasedQualifierResolver(final QualifierResolver alternateResolver, final Validator validator) {
+    public AnnotationBasedQualifierResolver(final QualifierResolver<Class<?>> alternateResolver, final Validator validator) {
         this.alternateResolver = alternateResolver;
         this.validator = validator;
     }
