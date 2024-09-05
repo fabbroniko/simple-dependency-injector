@@ -7,19 +7,23 @@ import org.example.naming.QualifierResolver;
 import org.example.registry.Registry;
 
 import java.util.Optional;
+import java.util.Set;
 
 public class ApplicationContextImpl implements ApplicationContext {
 
+    private final Set<Class<?>> scannedComponents;
     private final Registry registry;
     private final ComponentFactory componentFactory;
     private final ComponentResolver componentResolver;
     private final QualifierResolver<Class<?>> nameResolver;
 
-    public ApplicationContextImpl(final Registry registry,
+    public ApplicationContextImpl(final Set<Class<?>> scannedComponents,
+                                  final Registry registry,
                                   final ComponentFactory componentFactory,
                                   final ComponentResolver componentResolver,
                                   final QualifierResolver<Class<?>> nameResolver) {
 
+        this.scannedComponents = scannedComponents;
         this.registry = registry;
         this.componentFactory = componentFactory;
         this.componentResolver = componentResolver;
@@ -38,7 +42,7 @@ public class ApplicationContextImpl implements ApplicationContext {
             return (T) this;
         }
 
-        final Class<?> targetClass = componentResolver.resolve(target, qualifyingName);
+        final Class<?> targetClass = componentResolver.resolve(scannedComponents, target, qualifyingName);
         if (registry.isProcessing(targetClass)) {
             throw new CircularDependencyException("Component %s is already processing.".formatted(target.getName()));
         }

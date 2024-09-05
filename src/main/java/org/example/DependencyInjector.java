@@ -39,9 +39,10 @@ public class DependencyInjector {
         final Set<Class<?>> scannedComponents = annotationScanner.getAnnotatedClasses(rootPackage);
         final QualifierResolver<Class<?>> qualifierResolver = new AnnotationBasedQualifierResolver(new ClassBasedQualifierResolver(), new QualifierValidator());
         final QualifierResolver<Parameter> constructorResolver = new AnnotatedConstructorParameterQualifierResolver(new ConstructorParameterQualifierResolver(qualifierResolver, scannedComponents));
-        final ComponentResolver nameBasedComponentResolver = new NameBasedComponentResolver(scannedComponents, qualifierResolver, new AssignableComponentResolver(scannedComponents));
+        final ComponentResolver nameBasedComponentResolver = new NameBasedComponentResolver(qualifierResolver, new AssignableComponentResolver());
 
         return new ApplicationContextImpl(
+            scannedComponents,
             new SimpleRegistry(new HashMap<>(), new ImmutableInstanceFactory()),
             new ComponentFactoryImpl(constructorResolver),
             new TypeBasedComponentResolver(nameBasedComponentResolver),
