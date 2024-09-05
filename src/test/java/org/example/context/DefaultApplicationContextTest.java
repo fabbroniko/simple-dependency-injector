@@ -14,6 +14,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Optional;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -24,8 +25,10 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-class ApplicationContextImplTest {
+class DefaultApplicationContextTest {
 
+    @Mock
+    private Set<Class<?>> scannedComponents;
     @Mock
     private Registry registry;
     @Mock
@@ -37,7 +40,7 @@ class ApplicationContextImplTest {
     @Mock
     private Object instance;
     @InjectMocks
-    private ApplicationContextImpl applicationContext;
+    private DefaultApplicationContext applicationContext;
 
     @Test
     void shouldReturnSelfWhenTargetIsApplicationContext() {
@@ -47,7 +50,7 @@ class ApplicationContextImplTest {
 
     @Test
     void shouldThrowCircularDependencyException() {
-        doReturn(Object.class).when(componentResolver).resolve(any(), any());
+        doReturn(Object.class).when(componentResolver).resolve(any(), any(), any());
         when(registry.isProcessing(any())).thenReturn(true);
 
         assertThatThrownBy(() -> applicationContext.getInstance(Integer.class))
@@ -59,7 +62,7 @@ class ApplicationContextImplTest {
 
         @BeforeEach
         void setUp() {
-            doReturn(Object.class).when(componentResolver).resolve(any(), any());
+            doReturn(Object.class).when(componentResolver).resolve(any(), any(), any());
             when(registry.isProcessing(any())).thenReturn(false);
             when(registry.getInstance(any())).thenReturn(Optional.of(instance));
         }
@@ -76,7 +79,7 @@ class ApplicationContextImplTest {
 
             applicationContext.getInstance(Integer.class);
 
-            verify(componentResolver).resolve(Integer.class, "integer");
+            verify(componentResolver).resolve(scannedComponents, Integer.class, "integer");
         }
 
         @Test

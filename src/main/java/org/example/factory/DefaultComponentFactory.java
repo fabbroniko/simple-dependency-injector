@@ -10,11 +10,11 @@ import java.util.List;
 
 import static java.util.Arrays.stream;
 
-public class ComponentFactoryImpl implements ComponentFactory {
+public class DefaultComponentFactory implements ComponentFactory {
 
     private final QualifierResolver<Parameter> nameResolver;
 
-    public ComponentFactoryImpl(final QualifierResolver<Parameter> nameResolver) {
+    public DefaultComponentFactory(final QualifierResolver<Parameter> nameResolver) {
         this.nameResolver = nameResolver;
     }
 
