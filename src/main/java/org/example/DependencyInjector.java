@@ -5,6 +5,9 @@ import org.example.annotation.Configuration;
 import org.example.context.ApplicationContext;
 import org.example.context.ApplicationContextImpl;
 import org.example.factory.AssignableComponentResolver;
+import org.example.factory.ComponentResolver;
+import org.example.factory.NameBasedComponentResolver;
+import org.example.factory.TypeBasedComponentResolver;
 import org.example.factory.ComponentFactoryImpl;
 import org.example.naming.AnnotatedConstructorParameterQualifierResolver;
 import org.example.naming.AnnotationBasedQualifierResolver;
@@ -36,11 +39,12 @@ public class DependencyInjector {
         final Set<Class<?>> scannedComponents = annotationScanner.getAnnotatedClasses(rootPackage);
         final QualifierResolver<Class<?>> qualifierResolver = new AnnotationBasedQualifierResolver(new ClassBasedQualifierResolver(), new QualifierValidator());
         final QualifierResolver<Parameter> constructorResolver = new AnnotatedConstructorParameterQualifierResolver(new ConstructorParameterQualifierResolver(qualifierResolver, scannedComponents));
+        final ComponentResolver nameBasedComponentResolver = new NameBasedComponentResolver(scannedComponents, qualifierResolver, new AssignableComponentResolver(scannedComponents));
 
         return new ApplicationContextImpl(
             new SimpleRegistry(new HashMap<>(), new ImmutableInstanceFactory()),
             new ComponentFactoryImpl(constructorResolver),
-            new AssignableComponentResolver(scannedComponents, qualifierResolver),
+            new TypeBasedComponentResolver(nameBasedComponentResolver),
             qualifierResolver
         );
     }
