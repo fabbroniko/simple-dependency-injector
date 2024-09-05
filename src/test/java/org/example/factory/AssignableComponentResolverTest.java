@@ -20,22 +20,22 @@ class AssignableComponentResolverTest {
     private AssignableComponentResolver componentResolver;
 
     @Test
-    void shouldReturnTargetWhenNotAnInterface() {
-        assertThat(componentResolver.resolve(Set.of(), Object.class))
-            .isEqualTo(Object.class);
+    void shouldReturnAssignableClass() {
+        assertThat(componentResolver.resolve(Set.of(Integer.class), Integer.class, "class-test"))
+            .isEqualTo(Integer.class);
     }
 
     @Test
-    void shouldReturnComponentClassOfInterface() {
-        assertThat(componentResolver.resolve(Set.of(HashMap.class), Map.class))
+    void shouldReturnAssignableClassFromInterfaceTarget() {
+        assertThat(componentResolver.resolve(Set.of(HashMap.class), Map.class, "interface-test"))
             .isEqualTo(HashMap.class);
     }
 
     @Test
-    void shouldThrowExceptionWhenAssignableIsNotFound() {
+    void shouldThrowExceptionWhenMatchNotFound() {
         final Set<Class<?>> scannedComponents = Set.of();
 
-        assertThatThrownBy(() -> componentResolver.resolve(scannedComponents, Map.class))
+        assertThatThrownBy(() -> componentResolver.resolve(scannedComponents, Integer.class, "exception-test"))
             .isInstanceOf(InvalidDependencyException.class);
     }
 }

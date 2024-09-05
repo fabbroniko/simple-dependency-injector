@@ -1,9 +1,9 @@
 package org.example.context;
 
 import org.example.exception.CircularDependencyException;
-import org.example.exception.InvalidDependencyException;
 import org.example.factory.ComponentFactory;
 import org.example.factory.ComponentResolver;
+import org.example.naming.QualifierResolver;
 import org.example.registry.Registry;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -25,8 +25,10 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-class ApplicationContextImplTest {
+class DefaultApplicationContextTest {
 
+    @Mock
+    private Set<Class<?>> scannedComponents;
     @Mock
     private Registry registry;
     @Mock
@@ -34,35 +36,25 @@ class ApplicationContextImplTest {
     @Mock
     private ComponentResolver componentResolver;
     @Mock
-    private Set<Class<?>> scannedComponents;
+    private QualifierResolver<Class<?>> nameResolver;
     @Mock
     private Object instance;
     @InjectMocks
-    private ApplicationContextImpl applicationContext;
+    private DefaultApplicationContext applicationContext;
 
     @Test
-    void shouldThrowInvalidDependencyException() {
-        doReturn(Object.class).when(componentResolver).resolve(any(), any());
-        when(scannedComponents.contains(any(Class.class))).thenReturn(false);
-
-        assertThatThrownBy(() -> applicationContext.getInstance(Integer.class))
-            .isInstanceOf(InvalidDependencyException.class);
+    void shouldReturnSelfWhenTargetIsApplicationContext() {
+        assertThat((Object) applicationContext.getInstance(ApplicationContext.class))
+            .isEqualTo(applicationContext);
     }
 
     @Test
     void shouldThrowCircularDependencyException() {
-        doReturn(Object.class).when(componentResolver).resolve(any(), any());
-        when(scannedComponents.contains(any(Class.class))).thenReturn(true);
+        doReturn(Object.class).when(componentResolver).resolve(any(), any(), any());
         when(registry.isProcessing(any())).thenReturn(true);
 
         assertThatThrownBy(() -> applicationContext.getInstance(Integer.class))
             .isInstanceOf(CircularDependencyException.class);
-    }
-
-    @Test
-    void shouldReturnApplicationContext() {
-        assertThat((Object) applicationContext.getInstance(ApplicationContext.class))
-            .isEqualTo(applicationContext);
     }
 
     @Nested
@@ -70,24 +62,24 @@ class ApplicationContextImplTest {
 
         @BeforeEach
         void setUp() {
-            doReturn(Object.class).when(componentResolver).resolve(any(), any());
-            when(scannedComponents.contains(any(Class.class))).thenReturn(true);
+            doReturn(Object.class).when(componentResolver).resolve(any(), any(), any());
             when(registry.isProcessing(any())).thenReturn(false);
             when(registry.getInstance(any())).thenReturn(Optional.of(instance));
         }
 
         @Test
-        void shouldResolveClassToInitialize() {
-            applicationContext.getInstance(Integer.class);
+        void shouldResolveName() {
+            applicationContext.getInstance(Object.class);
 
-            verify(componentResolver).resolve(scannedComponents, Integer.class);
+            verify(nameResolver).resolve(Object.class);
         }
-
         @Test
-        void shouldRegisterTargetAsProcessing() {
+        void shouldResolveClassToInitialize() {
+            when(nameResolver.resolve(any())).thenReturn("integer");
+
             applicationContext.getInstance(Integer.class);
 
-            verify(registry).process(Integer.class);
+            verify(componentResolver).resolve(scannedComponents, Integer.class, "integer");
         }
 
         @Test
@@ -111,6 +103,15 @@ class ApplicationContextImplTest {
         }
 
         @Test
+        void shouldRegisterTargetAsProcessing() {
+            when(registry.getInstance(any())).thenReturn(Optional.empty());
+
+            applicationContext.getInstance(Integer.class);
+
+            verify(registry).process(Object.class);
+        }
+
+        @Test
         void shouldCreateComponent() {
             when(registry.getInstance(any())).thenReturn(Optional.empty());
 
@@ -126,7 +127,7 @@ class ApplicationContextImplTest {
 
             applicationContext.getInstance(Integer.class);
 
-            verify(registry).insert(Integer.class, instance);
+            verify(registry).insert(Object.class, instance);
         }
 
         @Test
