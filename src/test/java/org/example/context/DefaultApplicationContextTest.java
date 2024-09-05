@@ -25,7 +25,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-class ApplicationContextImplTest {
+class DefaultApplicationContextTest {
 
     @Mock
     private Set<Class<?>> scannedComponents;
@@ -40,7 +40,7 @@ class ApplicationContextImplTest {
     @Mock
     private Object instance;
     @InjectMocks
-    private ApplicationContextImpl applicationContext;
+    private DefaultApplicationContext applicationContext;
 
     @Test
     void shouldReturnSelfWhenTargetIsApplicationContext() {

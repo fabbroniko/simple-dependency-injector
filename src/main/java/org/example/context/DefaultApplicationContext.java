@@ -9,7 +9,7 @@ import org.example.registry.Registry;
 import java.util.Optional;
 import java.util.Set;
 
-public class ApplicationContextImpl implements ApplicationContext {
+public class DefaultApplicationContext implements ApplicationContext {
 
     private final Set<Class<?>> scannedComponents;
     private final Registry registry;
@@ -17,11 +17,11 @@ public class ApplicationContextImpl implements ApplicationContext {
     private final ComponentResolver componentResolver;
     private final QualifierResolver<Class<?>> nameResolver;
 
-    public ApplicationContextImpl(final Set<Class<?>> scannedComponents,
-                                  final Registry registry,
-                                  final ComponentFactory componentFactory,
-                                  final ComponentResolver componentResolver,
-                                  final QualifierResolver<Class<?>> nameResolver) {
+    public DefaultApplicationContext(final Set<Class<?>> scannedComponents,
+                                     final Registry registry,
+                                     final ComponentFactory componentFactory,
+                                     final ComponentResolver componentResolver,
+                                     final QualifierResolver<Class<?>> nameResolver) {
 
         this.scannedComponents = scannedComponents;
         this.registry = registry;

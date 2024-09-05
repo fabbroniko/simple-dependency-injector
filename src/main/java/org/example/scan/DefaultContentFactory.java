@@ -1,6 +1,6 @@
 package org.example.scan;
 
-public class ContentFactoryImpl implements ContentFactory {
+public class DefaultContentFactory implements ContentFactory {
 
     @Override
     public FileSystemContent createDirectory() {

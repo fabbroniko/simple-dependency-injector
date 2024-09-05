@@ -1,6 +1,6 @@
 package org.example;
 
-import org.example.scan.ContentFactoryImpl;
+import org.example.scan.DefaultContentFactory;
 import org.example.scan.ClassScanner;
 import org.example.scan.ClasspathClassScanner;
 import org.example.scan.SystemClassLoaderResourceLocator;
@@ -30,7 +30,7 @@ public class ClasspathClassScannerTest {
 
     @BeforeEach
     void setUp() {
-        final ClassScanner classScanner = new ClasspathClassScanner(new ContentFactoryImpl(), new SystemClassLoaderResourceLocator(), new URIFileFactory());
+        final ClassScanner classScanner = new ClasspathClassScanner(new DefaultContentFactory(), new SystemClassLoaderResourceLocator(), new URIFileFactory());
         scannedClasses = classScanner.get("org.example.target");
     }
 

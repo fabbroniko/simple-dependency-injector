@@ -25,7 +25,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-class ComponentFactoryImplTest {
+class DefaultComponentFactoryTest {
 
     @Mock
     private QualifierResolver<Parameter> nameResolver;
@@ -36,7 +36,7 @@ class ComponentFactoryImplTest {
     @Mock
     private Map<String, String> secondArgument;
     @InjectMocks
-    private ComponentFactoryImpl componentFactory;
+    private DefaultComponentFactory componentFactory;
 
     @BeforeEach
     void setUp() {
