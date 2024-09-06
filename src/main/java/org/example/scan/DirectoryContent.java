@@ -1,6 +1,7 @@
 package org.example.scan;
 
 import java.io.File;
+import java.net.URL;
 import java.util.Collection;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -12,14 +13,22 @@ import static java.util.Objects.requireNonNull;
 public class DirectoryContent implements FileSystemContent {
 
     private final ContentFactory contentFactory;
+    private final FileFactory fileFactory;
 
-    public DirectoryContent(final ContentFactory contentFactory) {
+    public DirectoryContent(final ContentFactory contentFactory,
+                            final FileFactory fileFactory) {
 
         this.contentFactory = contentFactory;
+        this.fileFactory = fileFactory;
     }
 
     @Override
-    public Set<Class<?>> getClasses(final String inPackage, final File directory) {
+    public Set<Class<?>> getClasses(final String inPackage, final URL resource) {
+        return getClasses(inPackage, fileFactory.create(resource));
+    }
+
+    @Override
+    public Set<Class<?>> getClasses(String inPackage, File directory) {
         final File[] content = requireNonNull(directory.listFiles());
         final Stream<Class<?>> directoryStream = stream(content)
             .filter(File::isDirectory)

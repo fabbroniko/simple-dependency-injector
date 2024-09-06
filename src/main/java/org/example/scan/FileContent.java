@@ -1,14 +1,23 @@
 package org.example.scan;
 
 import java.io.File;
+import java.net.URL;
 import java.util.Set;
 
 public class FileContent implements FileSystemContent {
 
     private final ClassLoaderWrapper classLoaderWrapper;
+    private final FileFactory fileFactory;
 
-    public FileContent(ClassLoaderWrapper classLoaderWrapper) {
+    public FileContent(final ClassLoaderWrapper classLoaderWrapper,
+                       final FileFactory fileFactory) {
         this.classLoaderWrapper = classLoaderWrapper;
+        this.fileFactory = fileFactory;
+    }
+
+    @Override
+    public Set<Class<?>> getClasses(final String inPackage, final URL resource) {
+        return getClasses(inPackage, fileFactory.create(resource));
     }
 
     @Override

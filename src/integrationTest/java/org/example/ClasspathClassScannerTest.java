@@ -1,8 +1,14 @@
 package org.example;
 
+import org.example.scan.ContentFactory;
+import org.example.scan.ContentSelector;
 import org.example.scan.DefaultContentFactory;
 import org.example.scan.ClassScanner;
 import org.example.scan.ClasspathClassScanner;
+import org.example.scan.DirectoryAndJarContentSelector;
+import org.example.scan.FileFactory;
+import org.example.scan.JarResourceLocator;
+import org.example.scan.StringToUrlResourceLocator;
 import org.example.scan.SystemClassLoaderResourceLocator;
 import org.example.scan.URIFileFactory;
 import org.example.target.circular.FirstCircularDependency;
@@ -30,7 +36,11 @@ public class ClasspathClassScannerTest {
 
     @BeforeEach
     void setUp() {
-        final ClassScanner classScanner = new ClasspathClassScanner(new DefaultContentFactory(), new SystemClassLoaderResourceLocator(), new URIFileFactory());
+        final FileFactory fileFactory = new URIFileFactory();
+        final ContentFactory contentFactory = new DefaultContentFactory(fileFactory, new JarResourceLocator(new StringToUrlResourceLocator()));
+        final ContentSelector contentSelector = new DirectoryAndJarContentSelector(contentFactory);
+        final ClassScanner classScanner = new ClasspathClassScanner(contentSelector, new SystemClassLoaderResourceLocator());
+
         scannedClasses = classScanner.get("org.example.target");
     }
 

@@ -1,30 +1,25 @@
 package org.example.scan;
 
-import java.io.File;
 import java.net.URL;
 import java.util.Set;
 
 public class ClasspathClassScanner implements ClassScanner {
 
-    private final ContentFactory contentFactory;
+    private final ContentSelector contentSelector;
     private final ResourceLocator resourceLocator;
-    private final FileFactory fileFactory;
 
-    public ClasspathClassScanner(final ContentFactory contentFactory,
-                                 final ResourceLocator resourceLocator,
-                                 final FileFactory fileFactory) {
+    public ClasspathClassScanner(final ContentSelector contentSelector,
+                                 final ResourceLocator resourceLocator) {
 
-        this.contentFactory = contentFactory;
+        this.contentSelector = contentSelector;
         this.resourceLocator = resourceLocator;
-        this.fileFactory = fileFactory;
     }
 
     @Override
     public Set<Class<?>> get(final String rootPackage) {
         final String rootPackageRelativePath = rootPackage.replace('.', '/');
         final URL resource = resourceLocator.locate(rootPackageRelativePath);
-        final File rootDirectory = fileFactory.create(resource);
 
-        return contentFactory.createJar().getClasses(rootPackage, rootDirectory);
+        return contentSelector.select(resource).getClasses(rootPackage, resource);
     }
 }
