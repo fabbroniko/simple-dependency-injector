@@ -44,8 +44,8 @@ class DirectoryContentTest {
         when(contentFactory.createFile()).thenReturn(fileContent);
         when(subDirectory.isDirectory()).thenReturn(true);
         when(file.isDirectory()).thenReturn(false);
-        when(fileContent.getClasses(anyString(), any())).thenReturn(Set.of(Object.class));
-        when(subDirectoryContent.getClasses(anyString(), any())).thenReturn(Set.of(Integer.class));
+        when(fileContent.getClasses(anyString(), any(File.class))).thenReturn(Set.of(Object.class));
+        when(subDirectoryContent.getClasses(anyString(), any(File.class))).thenReturn(Set.of(Integer.class));
     }
 
     @Test
