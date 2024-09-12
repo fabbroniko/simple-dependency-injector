@@ -2,11 +2,11 @@ package org.example.scan;
 
 import java.io.File;
 import java.net.URL;
-import java.util.Enumeration;
-import java.util.HashSet;
+import java.util.Collections;
 import java.util.Set;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
+import java.util.stream.Collectors;
 
 public class JarContent implements FileSystemContent {
 
@@ -24,32 +24,32 @@ public class JarContent implements FileSystemContent {
         return getClasses(inPackage, fileFactory.create(resourceLocator.locate(target.toString())));
     }
 
-    // TODO
     @Override
     public Set<Class<?>> getClasses(final String inPackage, final File file) {
-        final Set<Class<?>> classes = new HashSet<>();
         final String relativeDirectory = inPackage.replace('.', '/');
         final String jarPath = file.getAbsolutePath();
 
+        // TODO external file to jar
         try (JarFile jarFile = new JarFile(jarPath)){
-            Enumeration<JarEntry> entries = jarFile.entries();
-            while(entries.hasMoreElements()) {
-                JarEntry entry = entries.nextElement();
-                String entryName = entry.getName();
-                if(entryName.startsWith(relativeDirectory) && entryName.endsWith(".class")) {
-                    String className = entryName.replace('/', '.').replace('\\', '.').replace(".class", "");
-                    try {
-                        classes.add(Class.forName(className));
-                    }
-                    catch (ClassNotFoundException e) {
-                        throw new RuntimeException("ClassNotFoundException loading " + className);
-                    }
-                }
-            }
+            return Collections.list(jarFile.entries())
+                .stream()
+                .map(JarEntry::getName)
+                .filter(entryName -> entryName.startsWith(relativeDirectory))
+                .filter(entryName -> entryName.endsWith(".class"))
+                .map(entryName -> entryName.replace('/', '.').replace('\\', '.').replace(".class", ""))
+                .map(this::toClass)
+                .collect(Collectors.toSet());
+
         } catch (final Exception e) {
-
+            throw new RuntimeException("ClassNotFoundException loading ");
         }
+    }
 
-        return classes;
+    private Class<?> toClass(final String className) {
+        try {
+            return Class.forName(className);
+        } catch (final Exception e) {
+            throw new RuntimeException(); // TODO
+        }
     }
 }
