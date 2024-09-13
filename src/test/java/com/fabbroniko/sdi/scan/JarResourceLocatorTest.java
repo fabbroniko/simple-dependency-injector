@@ -1,7 +1,5 @@
 package com.fabbroniko.sdi.scan;
 
-import org.example.scan.JarResourceLocator;
-import org.example.scan.ResourceLocator;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;

@@ -1,8 +1,5 @@
 package com.fabbroniko.sdi.scan;
 
-import org.example.scan.ContentFactory;
-import org.example.scan.DirectoryAndJarContentSelector;
-import org.example.scan.FileSystemContent;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;

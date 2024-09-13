@@ -1,8 +1,5 @@
 package com.fabbroniko.sdi.scan;
 
-import org.example.scan.ClassLoaderWrapper;
-import org.example.scan.FileContent;
-import org.example.scan.FileFactory;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;

@@ -1,9 +1,5 @@
 package com.fabbroniko.sdi.scan;
 
-import org.example.scan.ClasspathClassScanner;
-import org.example.scan.ContentSelector;
-import org.example.scan.FileSystemContent;
-import org.example.scan.ResourceLocator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

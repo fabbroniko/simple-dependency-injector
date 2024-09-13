@@ -1,7 +1,6 @@
 package com.fabbroniko.sdi.scan;
 
 import com.fabbroniko.sdi.annotation.Component;
-import org.example.scan.AnnotationPresentPredicate;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

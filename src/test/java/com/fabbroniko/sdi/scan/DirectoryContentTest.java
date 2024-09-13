@@ -1,9 +1,5 @@
 package com.fabbroniko.sdi.scan;
 
-import org.example.scan.ContentFactory;
-import org.example.scan.DirectoryContent;
-import org.example.scan.FileFactory;
-import org.example.scan.FileSystemContent;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -24,7 +20,7 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class DirectoryContentTest {
 
-    private static final String PACKAGE = "org.example";
+    private static final String PACKAGE = "com.fabbroniko.sdi";
 
     @Mock
     private ContentFactory contentFactory;
@@ -68,7 +64,7 @@ class DirectoryContentTest {
     void shouldGetClassesFromSubDirectoryContent() {
         directoryContent.getClasses(PACKAGE, directory);
 
-        verify(subDirectoryContent).getClasses("org.example.scan", subDirectory);
+        verify(subDirectoryContent).getClasses("com.fabbroniko.sdi.scan", subDirectory);
     }
 
     @Test

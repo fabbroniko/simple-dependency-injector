@@ -1,16 +1,17 @@
 package com.fabbroniko.sdi;
 
-import org.example.scan.ContentFactory;
-import org.example.scan.ContentSelector;
-import org.example.scan.DefaultContentFactory;
-import org.example.scan.ClassScanner;
-import org.example.scan.ClasspathClassScanner;
-import org.example.scan.DirectoryAndJarContentSelector;
-import org.example.scan.FileFactory;
-import org.example.scan.JarResourceLocator;
-import org.example.scan.StringToUrlResourceLocator;
-import org.example.scan.SystemClassLoaderResourceLocator;
-import org.example.scan.URIFileFactory;
+
+import com.fabbroniko.sdi.scan.ClassScanner;
+import com.fabbroniko.sdi.scan.ClasspathClassScanner;
+import com.fabbroniko.sdi.scan.ContentFactory;
+import com.fabbroniko.sdi.scan.ContentSelector;
+import com.fabbroniko.sdi.scan.DefaultContentFactory;
+import com.fabbroniko.sdi.scan.DirectoryAndJarContentSelector;
+import com.fabbroniko.sdi.scan.FileFactory;
+import com.fabbroniko.sdi.scan.JarResourceLocator;
+import com.fabbroniko.sdi.scan.StringToUrlResourceLocator;
+import com.fabbroniko.sdi.scan.SystemClassLoaderResourceLocator;
+import com.fabbroniko.sdi.scan.URIFileFactory;
 import com.fabbroniko.sdi.target.circular.FirstCircularDependency;
 import com.fabbroniko.sdi.target.circular.SecondCircularDependency;
 import com.fabbroniko.sdi.target.interfaced.DependsOnInterface;
@@ -41,7 +42,7 @@ public class ClasspathClassScannerTest {
         final ContentSelector contentSelector = new DirectoryAndJarContentSelector(contentFactory);
         final ClassScanner classScanner = new ClasspathClassScanner(contentSelector, new SystemClassLoaderResourceLocator());
 
-        scannedClasses = classScanner.get("org.example.target");
+        scannedClasses = classScanner.get("com.fabbroniko.sdi.target");
     }
 
     @ParameterizedTest

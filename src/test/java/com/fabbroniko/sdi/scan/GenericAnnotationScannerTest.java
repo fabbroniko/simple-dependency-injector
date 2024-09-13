@@ -1,8 +1,5 @@
 package com.fabbroniko.sdi.scan;
 
-import org.example.scan.AnnotationPresentPredicate;
-import org.example.scan.ClassScanner;
-import org.example.scan.GenericAnnotationScanner;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

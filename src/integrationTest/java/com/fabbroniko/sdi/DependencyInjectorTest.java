@@ -18,7 +18,7 @@ import org.junit.jupiter.api.Test;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-@Configuration(componentScan = "org.example.target")
+@Configuration(componentScan = "com.fabbroniko.sdi.target")
 public class DependencyInjectorTest {
 
     @Test
