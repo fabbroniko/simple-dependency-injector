@@ -23,11 +23,13 @@ import com.fabbroniko.sdi.scan.ClassScanner;
 import com.fabbroniko.sdi.scan.ClasspathClassScanner;
 import com.fabbroniko.sdi.scan.ContentFactory;
 import com.fabbroniko.sdi.scan.ContentSelector;
+import com.fabbroniko.sdi.scan.DefaultClassLoaderWrapper;
 import com.fabbroniko.sdi.scan.DefaultContentFactory;
 import com.fabbroniko.sdi.scan.DirectoryAndJarContentSelector;
 import com.fabbroniko.sdi.scan.FileFactory;
 import com.fabbroniko.sdi.scan.GenericAnnotationScanner;
 import com.fabbroniko.sdi.scan.JarResourceLocator;
+import com.fabbroniko.sdi.scan.ResourceLocator;
 import com.fabbroniko.sdi.scan.StringToUrlResourceLocator;
 import com.fabbroniko.sdi.scan.SystemClassLoaderResourceLocator;
 import com.fabbroniko.sdi.scan.URIFileFactory;
@@ -41,13 +43,15 @@ public class DependencyInjector {
     public static ApplicationContext run(final Class<?> configuration) {
         final String rootPackage = configuration.getAnnotation(Configuration.class).componentScan();
         final FileFactory fileFactory = new URIFileFactory();
-        final ContentFactory contentFactory = new DefaultContentFactory(fileFactory, new JarResourceLocator(new StringToUrlResourceLocator()));
+        final ResourceLocator jarResourceLocator = new JarResourceLocator(new StringToUrlResourceLocator());
+        final ContentFactory contentFactory = new DefaultContentFactory(fileFactory, jarResourceLocator, new DefaultClassLoaderWrapper());
         final ContentSelector contentSelector = new DirectoryAndJarContentSelector(contentFactory);
         final ClassScanner classScanner = new ClasspathClassScanner(contentSelector, new SystemClassLoaderResourceLocator());
         final AnnotationScanner annotationScanner = new GenericAnnotationScanner(classScanner, new AnnotationPresentPredicate(Component.class));
         final Set<Class<?>> scannedComponents = annotationScanner.getAnnotatedClasses(rootPackage);
         final QualifierResolver<Class<?>> qualifierResolver = new AnnotationBasedQualifierResolver(new ClassBasedQualifierResolver(), new QualifierValidator());
-        final QualifierResolver<Parameter> constructorResolver = new AnnotatedConstructorParameterQualifierResolver(new ConstructorParameterQualifierResolver(qualifierResolver, scannedComponents));
+        final QualifierResolver<Parameter> constructorParamQualifierResolver = new ConstructorParameterQualifierResolver(qualifierResolver, scannedComponents);
+        final QualifierResolver<Parameter> constructorResolver = new AnnotatedConstructorParameterQualifierResolver(constructorParamQualifierResolver);
         final ComponentResolver nameBasedComponentResolver = new NameBasedComponentResolver(qualifierResolver, new AssignableComponentResolver());
 
         return new DefaultApplicationContext(

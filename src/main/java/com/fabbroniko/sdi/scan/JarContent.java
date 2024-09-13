@@ -12,11 +12,14 @@ public class JarContent implements FileSystemContent {
 
     private final FileFactory fileFactory;
     private final ResourceLocator resourceLocator;
+    private final ClassLoaderWrapper classLoaderWrapper;
 
     public JarContent(final FileFactory fileFactory,
-                      final ResourceLocator resourceLocator) {
+                      final ResourceLocator resourceLocator,
+                      final ClassLoaderWrapper classLoaderWrapper) {
         this.fileFactory = fileFactory;
         this.resourceLocator = resourceLocator;
+        this.classLoaderWrapper = classLoaderWrapper;
     }
 
     @Override
@@ -37,19 +40,11 @@ public class JarContent implements FileSystemContent {
                 .filter(entryName -> entryName.startsWith(relativeDirectory))
                 .filter(entryName -> entryName.endsWith(".class"))
                 .map(entryName -> entryName.replace('/', '.').replace('\\', '.').replace(".class", ""))
-                .map(this::toClass)
+                .map(classLoaderWrapper::forName)
                 .collect(Collectors.toSet());
 
         } catch (final Exception e) {
             throw new RuntimeException("ClassNotFoundException loading ");
-        }
-    }
-
-    private Class<?> toClass(final String className) {
-        try {
-            return Class.forName(className);
-        } catch (final Exception e) {
-            throw new RuntimeException(); // TODO
         }
     }
 }

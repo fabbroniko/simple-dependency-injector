@@ -5,10 +5,12 @@ import com.fabbroniko.sdi.scan.ClassScanner;
 import com.fabbroniko.sdi.scan.ClasspathClassScanner;
 import com.fabbroniko.sdi.scan.ContentFactory;
 import com.fabbroniko.sdi.scan.ContentSelector;
+import com.fabbroniko.sdi.scan.DefaultClassLoaderWrapper;
 import com.fabbroniko.sdi.scan.DefaultContentFactory;
 import com.fabbroniko.sdi.scan.DirectoryAndJarContentSelector;
 import com.fabbroniko.sdi.scan.FileFactory;
 import com.fabbroniko.sdi.scan.JarResourceLocator;
+import com.fabbroniko.sdi.scan.ResourceLocator;
 import com.fabbroniko.sdi.scan.StringToUrlResourceLocator;
 import com.fabbroniko.sdi.scan.SystemClassLoaderResourceLocator;
 import com.fabbroniko.sdi.scan.URIFileFactory;
@@ -38,7 +40,8 @@ public class ClasspathClassScannerTest {
     @BeforeEach
     void setUp() {
         final FileFactory fileFactory = new URIFileFactory();
-        final ContentFactory contentFactory = new DefaultContentFactory(fileFactory, new JarResourceLocator(new StringToUrlResourceLocator()));
+        final ResourceLocator resourceLocator = new JarResourceLocator(new StringToUrlResourceLocator());
+        final ContentFactory contentFactory = new DefaultContentFactory(fileFactory, resourceLocator, new DefaultClassLoaderWrapper());
         final ContentSelector contentSelector = new DirectoryAndJarContentSelector(contentFactory);
         final ClassScanner classScanner = new ClasspathClassScanner(contentSelector, new SystemClassLoaderResourceLocator());
 

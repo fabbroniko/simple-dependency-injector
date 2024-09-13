@@ -12,7 +12,13 @@ public class JarResourceLocator implements ResourceLocator {
 
     @Override
     public URL locate(final String target) {
-        final String sanitizedLocation = target.substring(0, target.indexOf("!")).substring(4);
+        String sanitizedLocation = target;
+        if (target.contains("!")) {
+            sanitizedLocation = sanitizedLocation.substring(0, target.indexOf("!"));
+        }
+        if(sanitizedLocation.startsWith("jar:")) {
+            sanitizedLocation = sanitizedLocation.substring(4);
+        }
 
         return stringToUrlLocator.locate(sanitizedLocation);
     }
