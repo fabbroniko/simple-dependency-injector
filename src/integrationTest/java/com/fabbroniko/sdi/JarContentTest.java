@@ -2,6 +2,7 @@ package com.fabbroniko.sdi;
 
 import com.fabbroniko.sdi.scan.ClassLoaderWrapper;
 import com.fabbroniko.sdi.scan.CustomClassLoaderWrapper;
+import com.fabbroniko.sdi.scan.DefaultJarFileFactory;
 import com.fabbroniko.sdi.scan.JarContent;
 import com.fabbroniko.sdi.scan.JarResourceLocator;
 import com.fabbroniko.sdi.scan.StringToUrlResourceLocator;
@@ -25,7 +26,11 @@ public class JarContentTest {
         final URL target = requireNonNull(Thread.currentThread().getContextClassLoader().getResource("scannable-jar.jar"));
         final URLClassLoader classLoader = new URLClassLoader(new URL[]{target}, this.getClass().getClassLoader());
         final ClassLoaderWrapper classLoaderWrapper = new CustomClassLoaderWrapper(classLoader);
-        final JarContent jarContent = new JarContent(new URIFileFactory(), new JarResourceLocator(new StringToUrlResourceLocator()), classLoaderWrapper);
+        final JarContent jarContent = new JarContent(
+            new URIFileFactory(),
+            new JarResourceLocator(new StringToUrlResourceLocator()),
+            classLoaderWrapper,
+            new DefaultJarFileFactory());
 
         scannedComponents = jarContent.getClasses("com.fabbroniko.scannable", target);
     }

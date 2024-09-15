@@ -1,6 +1,7 @@
 package com.fabbroniko.sdi.scan;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URL;
 import java.util.Collections;
 import java.util.Set;
@@ -13,13 +14,17 @@ public class JarContent implements FileSystemContent {
     private final FileFactory fileFactory;
     private final ResourceLocator resourceLocator;
     private final ClassLoaderWrapper classLoaderWrapper;
+    private final JarFileFactory jarFileFactory;
 
     public JarContent(final FileFactory fileFactory,
                       final ResourceLocator resourceLocator,
-                      final ClassLoaderWrapper classLoaderWrapper) {
+                      final ClassLoaderWrapper classLoaderWrapper,
+                      final JarFileFactory jarFileFactory) {
+
         this.fileFactory = fileFactory;
         this.resourceLocator = resourceLocator;
         this.classLoaderWrapper = classLoaderWrapper;
+        this.jarFileFactory = jarFileFactory;
     }
 
     @Override
@@ -32,8 +37,7 @@ public class JarContent implements FileSystemContent {
         final String relativeDirectory = inPackage.replace('.', '/');
         final String jarPath = file.getAbsolutePath();
 
-        // TODO external file to jar
-        try (JarFile jarFile = new JarFile(jarPath)){
+        try (final JarFile jarFile = jarFileFactory.create(jarPath)){
             return Collections.list(jarFile.entries())
                 .stream()
                 .map(JarEntry::getName)
@@ -43,8 +47,8 @@ public class JarContent implements FileSystemContent {
                 .map(classLoaderWrapper::forName)
                 .collect(Collectors.toSet());
 
-        } catch (final Exception e) {
-            throw new RuntimeException("ClassNotFoundException loading ");
+        } catch (final IOException e) {
+            throw new RuntimeException(e);
         }
     }
 }

@@ -5,13 +5,16 @@ public class DefaultContentFactory implements ContentFactory {
     private final FileFactory fileFactory;
     private final ResourceLocator jarResourceLocator;
     private final ClassLoaderWrapper classLoaderWrapper;
+    private final JarFileFactory jarFileFactory;
 
     public DefaultContentFactory(final FileFactory fileFactory,
                                  final ResourceLocator jarResourceLocator,
-                                 final ClassLoaderWrapper classLoaderWrapper) {
+                                 final ClassLoaderWrapper classLoaderWrapper,
+                                 final JarFileFactory jarFileFactory) {
         this.fileFactory = fileFactory;
         this.jarResourceLocator = jarResourceLocator;
         this.classLoaderWrapper = classLoaderWrapper;
+        this.jarFileFactory = jarFileFactory;
     }
 
     @Override
@@ -26,6 +29,6 @@ public class DefaultContentFactory implements ContentFactory {
 
     @Override
     public FileSystemContent createJar() {
-        return new JarContent(fileFactory, jarResourceLocator, classLoaderWrapper);
+        return new JarContent(fileFactory, jarResourceLocator, classLoaderWrapper, jarFileFactory);
     }
 }

@@ -25,6 +25,7 @@ import com.fabbroniko.sdi.scan.ContentFactory;
 import com.fabbroniko.sdi.scan.ContentSelector;
 import com.fabbroniko.sdi.scan.DefaultClassLoaderWrapper;
 import com.fabbroniko.sdi.scan.DefaultContentFactory;
+import com.fabbroniko.sdi.scan.DefaultJarFileFactory;
 import com.fabbroniko.sdi.scan.DirectoryAndJarContentSelector;
 import com.fabbroniko.sdi.scan.FileFactory;
 import com.fabbroniko.sdi.scan.GenericAnnotationScanner;
@@ -44,7 +45,11 @@ public class DependencyInjector {
         final String rootPackage = configuration.getAnnotation(Configuration.class).componentScan();
         final FileFactory fileFactory = new URIFileFactory();
         final ResourceLocator jarResourceLocator = new JarResourceLocator(new StringToUrlResourceLocator());
-        final ContentFactory contentFactory = new DefaultContentFactory(fileFactory, jarResourceLocator, new DefaultClassLoaderWrapper());
+        final ContentFactory contentFactory = new DefaultContentFactory(
+            fileFactory,
+            jarResourceLocator,
+            new DefaultClassLoaderWrapper(),
+            new DefaultJarFileFactory());
         final ContentSelector contentSelector = new DirectoryAndJarContentSelector(contentFactory);
         final ClassScanner classScanner = new ClasspathClassScanner(contentSelector, new SystemClassLoaderResourceLocator());
         final AnnotationScanner annotationScanner = new GenericAnnotationScanner(classScanner, new AnnotationPresentPredicate(Component.class));
