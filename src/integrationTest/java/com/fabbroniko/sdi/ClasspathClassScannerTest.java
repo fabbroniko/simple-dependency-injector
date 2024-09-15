@@ -1,8 +1,18 @@
-package com.fabbroniko.sdi.target;
+package com.fabbroniko.sdi;
 
-import com.fabbroniko.sdi.scan.DefaultContentFactory;
+
 import com.fabbroniko.sdi.scan.ClassScanner;
 import com.fabbroniko.sdi.scan.ClasspathClassScanner;
+import com.fabbroniko.sdi.scan.ContentFactory;
+import com.fabbroniko.sdi.scan.ContentSelector;
+import com.fabbroniko.sdi.scan.DefaultClassLoaderWrapper;
+import com.fabbroniko.sdi.scan.DefaultContentFactory;
+import com.fabbroniko.sdi.scan.DefaultJarFileFactory;
+import com.fabbroniko.sdi.scan.DirectoryAndJarContentSelector;
+import com.fabbroniko.sdi.scan.FileFactory;
+import com.fabbroniko.sdi.scan.JarResourceLocator;
+import com.fabbroniko.sdi.scan.ResourceLocator;
+import com.fabbroniko.sdi.scan.StringToUrlResourceLocator;
 import com.fabbroniko.sdi.scan.SystemClassLoaderResourceLocator;
 import com.fabbroniko.sdi.scan.URIFileFactory;
 import com.fabbroniko.sdi.target.circular.FirstCircularDependency;
@@ -30,7 +40,16 @@ public class ClasspathClassScannerTest {
 
     @BeforeEach
     void setUp() {
-        final ClassScanner classScanner = new ClasspathClassScanner(new DefaultContentFactory(), new SystemClassLoaderResourceLocator(), new URIFileFactory());
+        final FileFactory fileFactory = new URIFileFactory();
+        final ResourceLocator resourceLocator = new JarResourceLocator(new StringToUrlResourceLocator());
+        final ContentFactory contentFactory = new DefaultContentFactory(
+            fileFactory,
+            resourceLocator,
+            new DefaultClassLoaderWrapper(),
+            new DefaultJarFileFactory());
+        final ContentSelector contentSelector = new DirectoryAndJarContentSelector(contentFactory);
+        final ClassScanner classScanner = new ClasspathClassScanner(contentSelector, new SystemClassLoaderResourceLocator());
+
         scannedClasses = classScanner.get("com.fabbroniko.sdi.target");
     }
 

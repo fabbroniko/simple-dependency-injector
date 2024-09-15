@@ -5,4 +5,6 @@ public interface ContentFactory {
     FileSystemContent createDirectory();
 
     FileSystemContent createFile();
+
+    FileSystemContent createJar();
 }

@@ -1,6 +1,5 @@
-package com.fabbroniko.sdi.target;
+package com.fabbroniko.sdi;
 
-import com.fabbroniko.sdi.DependencyInjector;
 import com.fabbroniko.sdi.annotation.Configuration;
 import com.fabbroniko.sdi.context.ApplicationContext;
 import com.fabbroniko.sdi.exception.CircularDependencyException;

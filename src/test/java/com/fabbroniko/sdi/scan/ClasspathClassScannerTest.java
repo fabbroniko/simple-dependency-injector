@@ -7,7 +7,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.io.File;
 import java.net.URL;
 import java.util.Set;
 
@@ -23,13 +22,9 @@ public class ClasspathClassScannerTest {
     private static final String PACKAGE = "com.example";
 
     @Mock
-    private ContentFactory contentFactory;
+    private ContentSelector contentSelector;
     @Mock
     private ResourceLocator resourceLocator;
-    @Mock
-    private FileFactory fileFactory;
-    @Mock
-    private File file;
     @Mock
     private URL url;
     @Mock
@@ -42,9 +37,8 @@ public class ClasspathClassScannerTest {
     @BeforeEach
     void setUp() {
         when(resourceLocator.locate(anyString())).thenReturn(url);
-        when(fileFactory.create(any())).thenReturn(file);
-        when(contentFactory.createDirectory()).thenReturn(fileSystemContent);
-        when(fileSystemContent.getClasses(anyString(), any())).thenReturn(scannedClasses);
+        when(contentSelector.select(any())).thenReturn(fileSystemContent);
+        when(fileSystemContent.getClasses(anyString(), any(URL.class))).thenReturn(scannedClasses);
     }
 
     @Test
@@ -54,25 +48,19 @@ public class ClasspathClassScannerTest {
         verify(resourceLocator).locate("com/example");
     }
 
-    @Test
-    void shouldCreateFileFromResourceURL() {
-        classScanner.get(PACKAGE);
-
-        verify(fileFactory).create(url);
-    }
 
     @Test
-    void shouldCreateRootDirectoryContent() {
+    void shouldSelectContentImplementation() {
         classScanner.get(PACKAGE);
 
-        verify(contentFactory).createDirectory();
+        verify(contentSelector).select(url);
     }
 
     @Test
     void shouldGetClassesFromDirectoryContent() {
         classScanner.get(PACKAGE);
 
-        verify(fileSystemContent).getClasses(PACKAGE, file);
+        verify(fileSystemContent).getClasses(PACKAGE, url);
     }
 
     @Test

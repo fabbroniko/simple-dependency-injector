@@ -8,6 +8,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.io.File;
+import java.net.URL;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -33,6 +34,10 @@ class DirectoryContentTest {
     private File subDirectory;
     @Mock
     private File file;
+    @Mock
+    private URL url;
+    @Mock
+    private FileFactory fileFactory;
     @InjectMocks
     private DirectoryContent directoryContent;
 
@@ -44,8 +49,8 @@ class DirectoryContentTest {
         when(contentFactory.createFile()).thenReturn(fileContent);
         when(subDirectory.isDirectory()).thenReturn(true);
         when(file.isDirectory()).thenReturn(false);
-        when(fileContent.getClasses(anyString(), any())).thenReturn(Set.of(Object.class));
-        when(subDirectoryContent.getClasses(anyString(), any())).thenReturn(Set.of(Integer.class));
+        when(fileContent.getClasses(anyString(), any(File.class))).thenReturn(Set.of(Object.class));
+        when(subDirectoryContent.getClasses(anyString(), any(File.class))).thenReturn(Set.of(Integer.class));
     }
 
     @Test
@@ -73,5 +78,14 @@ class DirectoryContentTest {
     void shouldReturnCombinedSets() {
         assertThat(directoryContent.getClasses(PACKAGE, directory))
             .containsExactlyInAnyOrder(Object.class, Integer.class);
+    }
+
+    @Test
+    void shouldCreateFileFromUrl() {
+        when(fileFactory.create(any())).thenReturn(directory);
+
+        directoryContent.getClasses(PACKAGE, url);
+
+        verify(fileFactory).create(url);
     }
 }
