@@ -24,9 +24,13 @@ jobs:
         run: chmod +x ./gradlew
       - name: Build with Gradle
         run: ./gradlew build
+        env:
+          USERNAME: ${{ secrets.USERNAME }}
+          READ_TOKEN: ${{ secrets.READ_TOKEN }}
       - name: Publish to GitHub Packages
         run: ./gradlew publish
         env:
           USERNAME: ${{ secrets.USERNAME }}
-          TOKEN: ${{ secrets.TOKEN }}
+          WRITE_TOKEN: ${{ secrets.WRITE_TOKEN }}
+          READ_TOKEN: ${{ secrets.READ_TOKEN }}
           VERSION: ${{ github.ref_name }}

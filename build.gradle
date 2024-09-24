@@ -12,8 +12,8 @@ repositories {
         name = "GitHubPackages"
         url = uri("https://maven.pkg.github.com/fabbroniko/universal-logger")
         credentials {
-            username = project.findProperty("github.username") ?: System.getenv("GITHUB_USERNAME")
-            password = project.findProperty("github.token.read") ?: System.getenv("GITHUB_READ_TOKEN")
+            username = System.getenv("USERNAME")
+            password = System.getenv("READ_TOKEN")
         }
     }
 }
@@ -74,7 +74,7 @@ publishing {
             url = uri("https://maven.pkg.github.com/fabbroniko/simple-dependency-injector")
             credentials {
                 username = System.getenv("USERNAME")
-                password = System.getenv("TOKEN")
+                password = System.getenv("WRITE_TOKEN")
             }
         }
     }
