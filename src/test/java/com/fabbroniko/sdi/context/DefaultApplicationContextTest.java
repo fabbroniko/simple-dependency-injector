@@ -5,11 +5,12 @@ import com.fabbroniko.sdi.factory.ComponentFactory;
 import com.fabbroniko.sdi.factory.ComponentResolver;
 import com.fabbroniko.sdi.naming.QualifierResolver;
 import com.fabbroniko.sdi.registry.Registry;
+import com.fabbroniko.ul.Logger;
+import com.fabbroniko.ul.manager.LogManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -38,9 +39,25 @@ class DefaultApplicationContextTest {
     @Mock
     private QualifierResolver<Class<?>> nameResolver;
     @Mock
+    private LogManager logManager;
+    @Mock
+    private Logger logger;
+    @Mock
     private Object instance;
-    @InjectMocks
+
     private DefaultApplicationContext applicationContext;
+
+    @BeforeEach
+    void setUp() {
+        when(logManager.getLogger(any())).thenReturn(logger);
+
+        applicationContext = new DefaultApplicationContext(logManager,
+            scannedComponents,
+            registry,
+            componentFactory,
+            componentResolver,
+            nameResolver);
+    }
 
     @Test
     void shouldReturnSelfWhenTargetIsApplicationContext() {
@@ -55,6 +72,8 @@ class DefaultApplicationContextTest {
 
         assertThatThrownBy(() -> applicationContext.getInstance(Integer.class))
             .isInstanceOf(CircularDependencyException.class);
+
+        verify(logger).fatal("circular_dependency", "java.lang.Object");
     }
 
     @Nested
@@ -68,11 +87,26 @@ class DefaultApplicationContextTest {
         }
 
         @Test
+        void shouldLogGetInstance() {
+            applicationContext.getInstance(Object.class);
+
+            verify(logger).trace("get_instance", "java.lang.Object", null);
+        }
+
+        @Test
         void shouldResolveName() {
             applicationContext.getInstance(Object.class);
 
             verify(nameResolver).resolve(Object.class);
         }
+
+        @Test
+        void shouldLogResolveTargetClass() {
+            applicationContext.getInstance(Object.class);
+
+            verify(logger).trace("resolve_target_class", "java.lang.Object", null, "java.lang.Object");
+        }
+
         @Test
         void shouldResolveClassToInitialize() {
             when(nameResolver.resolve(any())).thenReturn("integer");
@@ -87,6 +121,13 @@ class DefaultApplicationContextTest {
             applicationContext.getInstance(Integer.class);
 
             verify(registry).getInstance(Object.class);
+        }
+
+        @Test
+        void shouldLogTargetFoundInRegistry() {
+            applicationContext.getInstance(Object.class);
+
+            verify(logger).trace("target_found_in_registry", "java.lang.Object");
         }
 
         @Test
@@ -109,6 +150,15 @@ class DefaultApplicationContextTest {
             applicationContext.getInstance(Integer.class);
 
             verify(registry).process(Object.class);
+        }
+
+        @Test
+        void shouldLogCreateNewInstance() {
+            when(registry.getInstance(any())).thenReturn(Optional.empty());
+
+            applicationContext.getInstance(Integer.class);
+
+            verify(logger).trace("create_new_instance", "java.lang.Object");
         }
 
         @Test

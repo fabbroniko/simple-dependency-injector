@@ -34,6 +34,11 @@ import com.fabbroniko.sdi.scan.ResourceLocator;
 import com.fabbroniko.sdi.scan.StringToUrlResourceLocator;
 import com.fabbroniko.sdi.scan.SystemClassLoaderResourceLocator;
 import com.fabbroniko.sdi.scan.URIFileFactory;
+import com.fabbroniko.ul.FormattedLogger;
+import com.fabbroniko.ul.Logger;
+import com.fabbroniko.ul.adapter.LoggerAdapter;
+import com.fabbroniko.ul.formatter.JsonLogFormatter;
+import com.fabbroniko.ul.manager.LogManager;
 
 import java.lang.reflect.Parameter;
 import java.util.HashMap;
@@ -60,11 +65,22 @@ public class DependencyInjector {
         final ComponentResolver nameBasedComponentResolver = new NameBasedComponentResolver(qualifierResolver, new AssignableComponentResolver());
 
         return new DefaultApplicationContext(
+            logManager(configuration),
             scannedComponents,
             new SimpleRegistry(new HashMap<>(), new ImmutableInstanceFactory()),
             new DefaultComponentFactory(constructorResolver),
             new TypeBasedComponentResolver(nameBasedComponentResolver),
             qualifierResolver
         );
+    }
+
+    private static LogManager logManager(final Class<?> configuration) {
+        final Class<? extends LogManager> logger = configuration.getAnnotation(Configuration.class).logger();
+
+        try {
+            return logger.getConstructor().newInstance();
+        } catch (final Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 }
