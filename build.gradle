@@ -8,6 +8,14 @@ version '1.0-SNAPSHOT'
 
 repositories {
     mavenCentral()
+    maven {
+        name = "GitHubPackages"
+        url = uri("https://maven.pkg.github.com/fabbroniko/universal-logger")
+        credentials {
+            username = project.findProperty("github.username") ?: System.getenv("GITHUB_USERNAME")
+            password = project.findProperty("github.token.read") ?: System.getenv("GITHUB_READ_TOKEN")
+        }
+    }
 }
 
 sourceSets {
@@ -50,6 +58,8 @@ integrationTest {
 }
 
 dependencies {
+    implementation 'com.fabbroniko:universal-logger:1.1.1'
+
     testImplementation 'org.junit.jupiter:junit-jupiter-engine:5.11.0'
     testImplementation 'org.junit.jupiter:junit-jupiter-params:5.11.0'
     testImplementation 'org.mockito:mockito-core:5.12.0'
