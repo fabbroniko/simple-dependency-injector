@@ -9,7 +9,7 @@ version System.getenv("VERSION")
 repositories {
     mavenCentral()
     maven {
-        name = "GitHubPackages"
+        name = "UniversalLoggerGitHubPackage"
         url = uri("https://maven.pkg.github.com/fabbroniko/universal-logger")
         credentials {
             username = System.getenv("USERNAME")
@@ -70,7 +70,7 @@ dependencies {
 publishing {
     repositories {
         maven {
-            name = "GitHubPackages"
+            name = "SimpleDependencyInjectorGitHubPackage"
             url = uri("https://maven.pkg.github.com/fabbroniko/simple-dependency-injector")
             credentials {
                 username = System.getenv("USERNAME")
