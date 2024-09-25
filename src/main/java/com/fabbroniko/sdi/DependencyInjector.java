@@ -34,10 +34,6 @@ import com.fabbroniko.sdi.scan.ResourceLocator;
 import com.fabbroniko.sdi.scan.StringToUrlResourceLocator;
 import com.fabbroniko.sdi.scan.SystemClassLoaderResourceLocator;
 import com.fabbroniko.sdi.scan.URIFileFactory;
-import com.fabbroniko.ul.FormattedLogger;
-import com.fabbroniko.ul.Logger;
-import com.fabbroniko.ul.adapter.LoggerAdapter;
-import com.fabbroniko.ul.formatter.JsonLogFormatter;
 import com.fabbroniko.ul.manager.LogManager;
 
 import java.lang.reflect.Parameter;
@@ -63,12 +59,13 @@ public class DependencyInjector {
         final QualifierResolver<Parameter> constructorParamQualifierResolver = new ConstructorParameterQualifierResolver(qualifierResolver, scannedComponents);
         final QualifierResolver<Parameter> constructorResolver = new AnnotatedConstructorParameterQualifierResolver(constructorParamQualifierResolver);
         final ComponentResolver nameBasedComponentResolver = new NameBasedComponentResolver(qualifierResolver, new AssignableComponentResolver());
+        final LogManager logManager = logManager(configuration);
 
         return new DefaultApplicationContext(
-            logManager(configuration),
+            logManager,
             scannedComponents,
             new SimpleRegistry(new HashMap<>(), new ImmutableInstanceFactory()),
-            new DefaultComponentFactory(constructorResolver),
+            new DefaultComponentFactory(constructorResolver, logManager),
             new TypeBasedComponentResolver(nameBasedComponentResolver),
             qualifierResolver
         );

@@ -8,17 +8,20 @@ import com.fabbroniko.sdi.target.circular.FirstCircularDependency;
 import com.fabbroniko.sdi.target.context.DependsOnContext;
 import com.fabbroniko.sdi.target.interfaced.DependsOnInterface;
 import com.fabbroniko.sdi.target.interfacedcircular.A;
+import com.fabbroniko.sdi.target.log.WithLoggerDependency;
 import com.fabbroniko.sdi.target.qualifier.Cat;
 import com.fabbroniko.sdi.target.qualifier.DependsOnMulti;
 import com.fabbroniko.sdi.target.qualifier.Dog;
 import com.fabbroniko.sdi.target.util.NoDependenciesTestClass;
 import com.fabbroniko.sdi.target.util.WithDependencyTestClass;
+import com.fabbroniko.ul.FormattedLogger;
+import com.fabbroniko.ul.manager.JdkLogManager;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-@Configuration(componentScan = "com.fabbroniko.sdi.target")
+@Configuration(componentScan = "com.fabbroniko.sdi.target", logger = JdkLogManager.class)
 public class DependencyInjectorTest {
 
     @Test
@@ -85,5 +88,13 @@ public class DependencyInjectorTest {
             .getInstance(DependsOnContext.class);
 
         assertThat(target.applicationContext()).isNotNull();
+    }
+
+    @Test
+    void shouldInjectLogger() {
+        WithLoggerDependency target = DependencyInjector.run(DependencyInjectorTest.class)
+            .getInstance(WithLoggerDependency.class);
+
+        assertThat(target.logger()).isInstanceOf(FormattedLogger.class);
     }
 }

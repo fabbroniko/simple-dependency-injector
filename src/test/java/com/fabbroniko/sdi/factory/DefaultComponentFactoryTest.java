@@ -3,6 +3,8 @@ package com.fabbroniko.sdi.factory;
 import com.fabbroniko.sdi.context.ApplicationContext;
 import com.fabbroniko.sdi.exception.InvalidComponentConstructorException;
 import com.fabbroniko.sdi.naming.QualifierResolver;
+import com.fabbroniko.ul.Logger;
+import com.fabbroniko.ul.manager.LogManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -35,6 +37,8 @@ class DefaultComponentFactoryTest {
     private Set<Object> firstArgument;
     @Mock
     private Map<String, String> secondArgument;
+    @Mock
+    private LogManager logManager;
     @InjectMocks
     private DefaultComponentFactory componentFactory;
 
@@ -87,6 +91,15 @@ class DefaultComponentFactoryTest {
             .isInstanceOf(WithConstructor.class);
     }
 
+    @Test
+    void shouldCreateLogger() {
+        reset(applicationContext);
+
+        componentFactory.create(WithLogger.class, applicationContext);
+
+        verify(logManager).getLogger(WithLogger.class);
+    }
+
     private static class ConstructorLess {
 
         private ConstructorLess() {}
@@ -95,5 +108,10 @@ class DefaultComponentFactoryTest {
     private static class WithConstructor {
 
         public WithConstructor(final Set<Object> firstArgument, final Map<String, String> secondArgument) {}
+    }
+
+    private static class WithLogger {
+
+        public WithLogger(final Logger logger) {}
     }
 }
