@@ -3,6 +3,8 @@ package com.fabbroniko.sdi.factory;
 import com.fabbroniko.sdi.context.ApplicationContext;
 import com.fabbroniko.sdi.exception.InvalidComponentConstructorException;
 import com.fabbroniko.sdi.naming.QualifierResolver;
+import com.fabbroniko.ul.Logger;
+import com.fabbroniko.ul.manager.LogManager;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Parameter;
@@ -13,9 +15,11 @@ import static java.util.Arrays.stream;
 public class DefaultComponentFactory implements ComponentFactory {
 
     private final QualifierResolver<Parameter> nameResolver;
+    private final LogManager logManager;
 
-    public DefaultComponentFactory(final QualifierResolver<Parameter> nameResolver) {
+    public DefaultComponentFactory(final QualifierResolver<Parameter> nameResolver, final LogManager logManager) {
         this.nameResolver = nameResolver;
+        this.logManager = logManager;
     }
 
     @Override
@@ -26,7 +30,7 @@ public class DefaultComponentFactory implements ComponentFactory {
 
         final Parameter[] params = constructor.getParameters();
         final List<Object> vals = stream(params)
-                .map(parameter -> parameterToInstance(parameter, context))
+                .map(parameter -> parameterToInstance(target, parameter, context))
                 .toList();
 
         try {
@@ -36,11 +40,14 @@ public class DefaultComponentFactory implements ComponentFactory {
         }
     }
 
-    private Object parameterToInstance(final Parameter parameter, final ApplicationContext context) {
-        if(parameter.getType().isAssignableFrom(ApplicationContext.class)) {
+    private Object parameterToInstance(final Class<?> target, final Parameter parameter, final ApplicationContext context) {
+        final Class<?> dependencyType = parameter.getType();
+        if (dependencyType.isAssignableFrom(ApplicationContext.class)) {
             return context.getInstance(ApplicationContext.class);
+        } else if (dependencyType.isAssignableFrom(Logger.class)) {
+            return logManager.getLogger(target);
         }
 
-        return context.getInstance(parameter.getType(), nameResolver.resolve(parameter));
+        return context.getInstance(dependencyType, nameResolver.resolve(parameter));
     }
 }
