@@ -24,9 +24,9 @@ public class GenericAnnotationScanner implements AnnotationScanner {
     public Set<Class<?>> getAnnotatedClasses(final String rootPackage) {
         return classScanner.get(rootPackage)
             .stream()
-            .peek(scannedClass -> logger.info("classes_scanned", rootPackage, scannedClass.getName()))
+            .peek(scannedClass -> logger.trace("classes_scanned", rootPackage, scannedClass.getName()))
             .filter(annotationPresentPredicate)
-            .peek(annotatedClass -> logger.info("annotated_classes_scanned", rootPackage, annotatedClass.getName()))
+            .peek(annotatedClass -> logger.trace("annotated_classes_scanned", rootPackage, annotatedClass.getName()))
             .collect(Collectors.toSet());
     }
 }
