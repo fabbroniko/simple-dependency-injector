@@ -53,13 +53,13 @@ public class DependencyInjector {
             new DefaultJarFileFactory());
         final ContentSelector contentSelector = new DirectoryAndJarContentSelector(contentFactory);
         final ClassScanner classScanner = new ClasspathClassScanner(contentSelector, new SystemClassLoaderResourceLocator());
-        final AnnotationScanner annotationScanner = new GenericAnnotationScanner(classScanner, new AnnotationPresentPredicate(Component.class));
+        final LogManager logManager = logManager(configuration);
+        final AnnotationScanner annotationScanner = new GenericAnnotationScanner(classScanner, new AnnotationPresentPredicate(Component.class), logManager);
         final Set<Class<?>> scannedComponents = annotationScanner.getAnnotatedClasses(rootPackage);
         final QualifierResolver<Class<?>> qualifierResolver = new AnnotationBasedQualifierResolver(new ClassBasedQualifierResolver(), new QualifierValidator());
         final QualifierResolver<Parameter> constructorParamQualifierResolver = new ConstructorParameterQualifierResolver(qualifierResolver, scannedComponents);
         final QualifierResolver<Parameter> constructorResolver = new AnnotatedConstructorParameterQualifierResolver(constructorParamQualifierResolver);
         final ComponentResolver nameBasedComponentResolver = new NameBasedComponentResolver(qualifierResolver, new AssignableComponentResolver());
-        final LogManager logManager = logManager(configuration);
 
         return new DefaultApplicationContext(
             logManager,
