@@ -60,6 +60,7 @@ public class DependencyInjector {
         final QualifierResolver<Parameter> constructorParamQualifierResolver = new ConstructorParameterQualifierResolver(qualifierResolver, scannedComponents);
         final QualifierResolver<Parameter> constructorResolver = new AnnotatedConstructorParameterQualifierResolver(constructorParamQualifierResolver);
         final ComponentResolver nameBasedComponentResolver = new NameBasedComponentResolver(qualifierResolver, new AssignableComponentResolver());
+        final LogManager logManager = logManager(configuration);
 
         return new DefaultApplicationContext(
             logManager,
