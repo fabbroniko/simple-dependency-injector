@@ -21,7 +21,7 @@ repositories {
     mavenCentral()
     maven {
         name = "SimpleDependencyInjectorGitHubPackage"
-        url = uri("https://maven.pkg.github.com/fabbroniko/universal-logger")
+        url = uri("https://maven.pkg.github.com/fabbroniko/simple-dependency-injector")
         credentials {
             username = project.findProperty("github.username") ?: System.getenv("GITHUB_USERNAME")
             password = project.findProperty("github.token.read") ?: System.getenv("GITHUB_READ_TOKEN")
