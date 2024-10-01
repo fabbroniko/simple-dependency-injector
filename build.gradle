@@ -9,11 +9,11 @@ version System.getenv("VERSION")
 repositories {
     mavenCentral()
     maven {
-        name = "GitHubPackages"
+        name = "UniversalLoggerGitHubPackage"
         url = uri("https://maven.pkg.github.com/fabbroniko/universal-logger")
         credentials {
-            username = System.getenv("USERNAME")
-            password = System.getenv("READ_TOKEN")
+            username = System.getenv("GITHUB_ACTOR")
+            password = System.getenv("GITHUB_TOKEN")
         }
     }
 }
@@ -58,7 +58,7 @@ integrationTest {
 }
 
 dependencies {
-    implementation 'com.fabbroniko:universal-logger:1.1.1'
+    implementation 'com.fabbroniko:universal-logger:1.1.2'
 
     testImplementation 'org.junit.jupiter:junit-jupiter-engine:5.11.0'
     testImplementation 'org.junit.jupiter:junit-jupiter-params:5.11.0'
@@ -70,11 +70,11 @@ dependencies {
 publishing {
     repositories {
         maven {
-            name = "GitHubPackages"
+            name = "SimpleDependencyInjectorGitHubPackage"
             url = uri("https://maven.pkg.github.com/fabbroniko/simple-dependency-injector")
             credentials {
-                username = System.getenv("USERNAME")
-                password = System.getenv("WRITE_TOKEN")
+                username = System.getenv("GITHUB_ACTOR")
+                password = System.getenv("GITHUB_TOKEN")
             }
         }
     }

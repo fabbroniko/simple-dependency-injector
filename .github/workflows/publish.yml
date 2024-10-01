@@ -25,12 +25,11 @@ jobs:
       - name: Build with Gradle
         run: ./gradlew build
         env:
-          USERNAME: ${{ secrets.USERNAME }}
-          READ_TOKEN: ${{ secrets.READ_TOKEN }}
+          GITHUB_ACTOR: ${{ github.actor }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Publish to GitHub Packages
         run: ./gradlew publish
         env:
-          USERNAME: ${{ secrets.USERNAME }}
-          WRITE_TOKEN: ${{ secrets.WRITE_TOKEN }}
-          READ_TOKEN: ${{ secrets.READ_TOKEN }}
+          GITHUB_ACTOR: ${{ github.actor }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           VERSION: ${{ github.ref_name }}
