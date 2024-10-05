@@ -41,7 +41,7 @@ github.token.read=# An access token with read:packages scope
 Finally, import the library as usual.
 
 ```groovy
-implementation 'com.fabbroniko:simple-dependency-injector:1.0.1'
+implementation 'com.fabbroniko:simple-dependency-injector:1.1.0'
 ```
 
 ### Quick Start

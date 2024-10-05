@@ -2,12 +2,14 @@ package com.fabbroniko.sdi;
 
 import com.fabbroniko.sdi.context.ApplicationContext;
 import com.fabbroniko.sdi.exception.CircularDependencyException;
+import com.fabbroniko.sdi.exception.ComponentDefinitionException;
 import com.fabbroniko.sdi.exception.DependencyResolutionException;
 import com.fabbroniko.sdi.target.circular.FirstCircularDependency;
 import com.fabbroniko.sdi.target.context.DependsOnContext;
 import com.fabbroniko.sdi.target.interfaced.DependsOnInterface;
 import com.fabbroniko.sdi.target.interfacedcircular.A;
 import com.fabbroniko.sdi.target.log.WithLoggerDependency;
+import com.fabbroniko.sdi.target.noncomponent.NonComponent;
 import com.fabbroniko.sdi.target.qualifier.Cat;
 import com.fabbroniko.sdi.target.qualifier.DependsOnMulti;
 import com.fabbroniko.sdi.target.qualifier.Dog;
@@ -93,5 +95,13 @@ public class DependencyInjectorTest {
             .getInstance(WithLoggerDependency.class);
 
         assertThat(target.logger()).isInstanceOf(FormattedLogger.class);
+    }
+
+    @Test
+    void shouldThrowExceptionWhenGettingInstanceOfNonAnnotatedClass() {
+        final ApplicationContext applicationContext = DependencyInjector.run(NonComponent.class);
+
+        assertThatThrownBy(() -> applicationContext.getInstance(NonComponent.class))
+            .isInstanceOf(ComponentDefinitionException.class);
     }
 }

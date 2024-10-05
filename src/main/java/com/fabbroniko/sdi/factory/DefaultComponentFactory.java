@@ -16,10 +16,12 @@ public class DefaultComponentFactory implements ComponentFactory {
 
     private final QualifierResolver<Parameter> nameResolver;
     private final LogManager logManager;
+    private final Logger logger;
 
     public DefaultComponentFactory(final QualifierResolver<Parameter> nameResolver, final LogManager logManager) {
         this.nameResolver = nameResolver;
         this.logManager = logManager;
+        this.logger = logManager.getLogger(DefaultComponentFactory.class);
     }
 
     @Override
@@ -42,9 +44,12 @@ public class DefaultComponentFactory implements ComponentFactory {
 
     private Object parameterToInstance(final Class<?> target, final Parameter parameter, final ApplicationContext context) {
         final Class<?> dependencyType = parameter.getType();
+        logger.trace("parameter_to_instance", target.getName(), parameter.getName(), dependencyType.getName());
         if (dependencyType.isAssignableFrom(ApplicationContext.class)) {
+            logger.trace("returning_context", target.getName(), parameter.getName(), dependencyType.getName());
             return context.getInstance(ApplicationContext.class);
         } else if (dependencyType.isAssignableFrom(Logger.class)) {
+            logger.trace("returning_logger", target.getName(), parameter.getName(), dependencyType.getName());
             return logManager.getLogger(target);
         }
 

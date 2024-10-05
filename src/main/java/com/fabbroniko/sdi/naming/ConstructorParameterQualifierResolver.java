@@ -29,6 +29,9 @@ public class ConstructorParameterQualifierResolver implements QualifierResolver<
                 .formatted(target.getName(), constructorParameter.getDeclaringExecutable()));
         }
 
-        return classBasedNameResolver.resolve(matchingClasses.stream().findFirst().orElseThrow());
+        return classBasedNameResolver.resolve(matchingClasses.stream().findFirst().orElseThrow(
+            () -> new DependencyResolutionException("Could not resolve dependency %s of %s"
+                .formatted(target.getName(), constructorParameter.getDeclaringExecutable()))
+        ));
     }
 }

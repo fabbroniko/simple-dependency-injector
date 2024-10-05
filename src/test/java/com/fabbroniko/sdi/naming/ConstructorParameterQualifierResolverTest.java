@@ -8,6 +8,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.lang.reflect.Parameter;
+import java.util.Map;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -46,7 +47,8 @@ class ConstructorParameterQualifierResolverTest {
         doReturn(Object.class).when(constructorParam).getType();
 
         assertThatThrownBy(() -> resolver.resolve(constructorParam))
-            .isInstanceOf(DependencyResolutionException.class);
+            .isInstanceOf(DependencyResolutionException.class)
+            .hasMessage("More than one class of type java.lang.Object found. Use @Qualifier to specify the name of the component to use for null");
     }
 
     @Test
@@ -65,5 +67,14 @@ class ConstructorParameterQualifierResolverTest {
 
         assertThat(resolver.resolve(constructorParam))
             .isEqualTo("delegated");
+    }
+
+    @Test
+    void shouldThrowExceptionWhenNoneMatch() {
+        doReturn(Map.class).when(constructorParam).getType();
+
+        assertThatThrownBy(() -> resolver.resolve(constructorParam))
+            .isInstanceOf(DependencyResolutionException.class)
+            .hasMessage("Could not resolve dependency java.util.Map of null");
     }
 }

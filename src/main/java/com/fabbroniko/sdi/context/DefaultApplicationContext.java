@@ -1,6 +1,8 @@
 package com.fabbroniko.sdi.context;
 
+import com.fabbroniko.sdi.annotation.Component;
 import com.fabbroniko.sdi.exception.CircularDependencyException;
+import com.fabbroniko.sdi.exception.ComponentDefinitionException;
 import com.fabbroniko.sdi.factory.ComponentFactory;
 import com.fabbroniko.sdi.factory.ComponentResolver;
 import com.fabbroniko.sdi.naming.QualifierResolver;
@@ -54,8 +56,13 @@ public class DefaultApplicationContext implements ApplicationContext {
             throw new CircularDependencyException("Component %s is already processing.".formatted(targetClass.getName()));
         }
 
+        if (!targetClass.isAnnotationPresent(Component.class)) {
+            throw new ComponentDefinitionException("Resolved target class %s is not a Component"
+                .formatted(targetClass.getName()));
+        }
+
         final Optional<Object> registeredInstance = registry.getInstance(targetClass);
-        if(registeredInstance.isPresent()) {
+        if (registeredInstance.isPresent()) {
             logger.trace("target_found_in_registry", target.getName());
             return (T) registeredInstance.get();
         }
