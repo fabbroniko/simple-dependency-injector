@@ -41,7 +41,7 @@ github.token.read=# An access token with read:packages scope
 Finally, import the library as usual.
 
 ```groovy
-implementation 'com.fabbroniko:simple-dependency-injector:1.0.1'
+implementation 'com.fabbroniko:simple-dependency-injector:1.1.0'
 ```
 
 ### Quick Start
@@ -86,7 +86,7 @@ public class Application {
 In the sample above the creation of singleton instances of `Sample`, `Logger` and `Dependency` are managed by the library and happen behind the scene.
 
 There are 2 interfaces you can declare as dependency that are automatically managed by the library:
-- `Logger`: It uses the facade `com.fabbroniko:universal-logger` to create an instance of a logger of your choice (`Logj4`, `Java Util`, etc).
+- `Logger`: It uses the facade `com.fabbroniko:universal-logger` to create an instance of a logger of your choice (`Logj4`, `Java Util`, etc.).
 - `ApplicationContext`: It can be used to programmatically get instances of other annotated classes.
 
 All other dependencies of your annotated class must be annotated classes as well.

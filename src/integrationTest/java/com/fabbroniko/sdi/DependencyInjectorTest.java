@@ -2,15 +2,19 @@ package com.fabbroniko.sdi;
 
 import com.fabbroniko.sdi.context.ApplicationContext;
 import com.fabbroniko.sdi.exception.CircularDependencyException;
+import com.fabbroniko.sdi.exception.ComponentDefinitionException;
 import com.fabbroniko.sdi.exception.DependencyResolutionException;
 import com.fabbroniko.sdi.target.circular.FirstCircularDependency;
 import com.fabbroniko.sdi.target.context.DependsOnContext;
 import com.fabbroniko.sdi.target.interfaced.DependsOnInterface;
 import com.fabbroniko.sdi.target.interfacedcircular.A;
 import com.fabbroniko.sdi.target.log.WithLoggerDependency;
+import com.fabbroniko.sdi.target.noncomponent.NonComponent;
+import com.fabbroniko.sdi.target.prototype.PrototypeComponent;
 import com.fabbroniko.sdi.target.qualifier.Cat;
 import com.fabbroniko.sdi.target.qualifier.DependsOnMulti;
 import com.fabbroniko.sdi.target.qualifier.Dog;
+import com.fabbroniko.sdi.target.singleton.SingletonComponent;
 import com.fabbroniko.sdi.target.util.NoDependenciesTestClass;
 import com.fabbroniko.sdi.target.util.WithDependencyTestClass;
 import com.fabbroniko.ul.FormattedLogger;
@@ -34,7 +38,7 @@ public class DependencyInjectorTest {
     void shouldLoadBothClassesWithSameInterface() {
         final ApplicationContext context = DependencyInjector.run(DependsOnMulti.class);
 
-        assertThat((DependsOnMulti) context.getInstance(DependsOnMulti.class))
+        assertThat(context.getInstance(DependsOnMulti.class))
             .satisfies(multi -> assertThat(multi.animal()).isInstanceOf(Cat.class))
             .satisfies(multi -> assertThat(multi.secondAnimal()).isInstanceOf(Dog.class));
     }
@@ -93,5 +97,31 @@ public class DependencyInjectorTest {
             .getInstance(WithLoggerDependency.class);
 
         assertThat(target.logger()).isInstanceOf(FormattedLogger.class);
+    }
+
+    @Test
+    void shouldThrowExceptionWhenGettingInstanceOfNonAnnotatedClass() {
+        final ApplicationContext applicationContext = DependencyInjector.run(NonComponent.class);
+
+        assertThatThrownBy(() -> applicationContext.getInstance(NonComponent.class))
+            .isInstanceOf(ComponentDefinitionException.class);
+    }
+
+    @Test
+    void shouldCreateMultipleInstancesWithPrototype() {
+        final ApplicationContext applicationContext = DependencyInjector.run(PrototypeComponent.class);
+        final PrototypeComponent firstInstance = applicationContext.getInstance(PrototypeComponent.class);
+        final PrototypeComponent secondInstance = applicationContext.getInstance(PrototypeComponent.class);
+
+        assertThat(firstInstance).isNotEqualTo(secondInstance);
+    }
+
+    @Test
+    void shouldReturnSameInstancesWithSingleton() {
+        final ApplicationContext applicationContext = DependencyInjector.run(SingletonComponent.class);
+        final SingletonComponent firstInstance = applicationContext.getInstance(SingletonComponent.class);
+        final SingletonComponent secondInstance = applicationContext.getInstance(SingletonComponent.class);
+
+        assertThat(firstInstance).isEqualTo(secondInstance);
     }
 }

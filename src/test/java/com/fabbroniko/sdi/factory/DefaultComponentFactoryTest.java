@@ -8,7 +8,6 @@ import com.fabbroniko.ul.manager.LogManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -39,13 +38,18 @@ class DefaultComponentFactoryTest {
     private Map<String, String> secondArgument;
     @Mock
     private LogManager logManager;
-    @InjectMocks
+    @Mock
+    private Logger logger;
+
     private DefaultComponentFactory componentFactory;
 
     @BeforeEach
     void setUp() {
+        when(logManager.getLogger(any())).thenReturn(logger);
         when(applicationContext.getInstance(eq(Set.class), anyString())).thenReturn(firstArgument);
         when(applicationContext.getInstance(eq(Map.class), anyString())).thenReturn(secondArgument);
+
+        componentFactory = new DefaultComponentFactory(nameResolver, logManager);
     }
 
     @Test
@@ -100,6 +104,63 @@ class DefaultComponentFactoryTest {
         verify(logManager).getLogger(WithLogger.class);
     }
 
+    @Test
+    void shouldLogCreateLogger() {
+        reset(applicationContext);
+
+        componentFactory.create(WithLogger.class, applicationContext);
+
+        verify(logger).trace("returning_logger",
+            "com.fabbroniko.sdi.factory.DefaultComponentFactoryTest$WithLogger",
+            "arg0",
+            "com.fabbroniko.ul.Logger");
+    }
+
+    @Test
+    void shouldGetInstanceOfApplicationContext() {
+        reset(applicationContext);
+
+        componentFactory.create(WithApplicationContext.class, applicationContext);
+
+        verify(applicationContext).getInstance(ApplicationContext.class);
+    }
+
+    @Test
+    void shouldLogGetInstanceOfApplicationContext() {
+        reset(applicationContext);
+
+        componentFactory.create(WithApplicationContext.class, applicationContext);
+
+        verify(logger).trace("returning_context",
+            "com.fabbroniko.sdi.factory.DefaultComponentFactoryTest$WithApplicationContext",
+            "arg0",
+            "com.fabbroniko.sdi.context.ApplicationContext");
+    }
+
+    @Test
+    void shouldLogFirstParameterToInstance() {
+        when(nameResolver.resolve(any())).thenReturn("setType").thenReturn("mapType");
+
+        componentFactory.create(WithConstructor.class, applicationContext);
+
+        verify(logger).trace("parameter_to_instance",
+            "com.fabbroniko.sdi.factory.DefaultComponentFactoryTest$WithConstructor",
+            "arg0",
+            "java.util.Set");
+    }
+
+    @Test
+    void shouldLogSecondParameterToInstance() {
+        when(nameResolver.resolve(any())).thenReturn("setType").thenReturn("mapType");
+
+        componentFactory.create(WithConstructor.class, applicationContext);
+
+        verify(logger).trace("parameter_to_instance",
+            "com.fabbroniko.sdi.factory.DefaultComponentFactoryTest$WithConstructor",
+            "arg1",
+            "java.util.Map");
+    }
+
     private static class ConstructorLess {
 
         private ConstructorLess() {}
@@ -113,5 +174,10 @@ class DefaultComponentFactoryTest {
     private static class WithLogger {
 
         public WithLogger(final Logger logger) {}
+    }
+
+    private static class WithApplicationContext {
+
+        public WithApplicationContext(final ApplicationContext applicationContext) {}
     }
 }
