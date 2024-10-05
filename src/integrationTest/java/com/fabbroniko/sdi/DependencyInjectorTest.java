@@ -36,7 +36,7 @@ public class DependencyInjectorTest {
     void shouldLoadBothClassesWithSameInterface() {
         final ApplicationContext context = DependencyInjector.run(DependsOnMulti.class);
 
-        assertThat((DependsOnMulti) context.getInstance(DependsOnMulti.class))
+        assertThat(context.getInstance(DependsOnMulti.class))
             .satisfies(multi -> assertThat(multi.animal()).isInstanceOf(Cat.class))
             .satisfies(multi -> assertThat(multi.secondAnimal()).isInstanceOf(Dog.class));
     }

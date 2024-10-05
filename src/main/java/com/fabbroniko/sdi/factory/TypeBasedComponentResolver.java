@@ -11,7 +11,7 @@ public class TypeBasedComponentResolver implements ComponentResolver {
     }
 
     @Override
-    public Class<?> resolve(final Set<Class<?>> scannedComponents, final Class<?> target, final String qualifyingName) {
+    public <T> Class<T> resolve(final Set<Class<?>> scannedComponents, final Class<T> target, final String qualifyingName) {
         if (!target.isInterface()) {
             return target;
         }

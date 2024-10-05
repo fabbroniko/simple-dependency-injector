@@ -16,8 +16,9 @@ public class NameBasedComponentResolver implements ComponentResolver {
     }
 
     @Override
-    public Class<?> resolve(final Set<Class<?>> scannedComponents, final Class<?> target, final String qualifyingName) {
-        return scannedComponents.stream()
+    @SuppressWarnings("unchecked")
+    public <T> Class<T> resolve(final Set<Class<?>> scannedComponents, final Class<T> target, final String qualifyingName) {
+        return (Class<T>) scannedComponents.stream()
             .filter(target::isAssignableFrom)
             .filter(component -> nameResolver.resolve(component).equals(qualifyingName))
             .findAny().orElseGet(() -> fallbackComponentResolver.resolve(scannedComponents, target, qualifyingName));

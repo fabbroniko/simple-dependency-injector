@@ -4,5 +4,5 @@ import com.fabbroniko.sdi.context.ApplicationContext;
 
 public interface ComponentFactory {
 
-    Object create(final Class<?> target, final ApplicationContext context);
+    <T> T create(final Class<T> target, final ApplicationContext context);
 }

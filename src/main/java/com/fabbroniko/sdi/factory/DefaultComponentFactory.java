@@ -25,7 +25,8 @@ public class DefaultComponentFactory implements ComponentFactory {
     }
 
     @Override
-    public Object create(final Class<?> target, final ApplicationContext context) {
+    @SuppressWarnings("unchecked")
+    public <T> T create(final Class<T> target, final ApplicationContext context) {
         final Constructor<?> constructor = stream(target.getConstructors())
             .findAny()
             .orElseThrow(InvalidComponentConstructorException::new);
@@ -36,7 +37,7 @@ public class DefaultComponentFactory implements ComponentFactory {
                 .toList();
 
         try {
-            return constructor.newInstance(vals.toArray());
+            return (T) constructor.newInstance(vals.toArray());
         } catch (final Exception e) {
             throw new RuntimeException(e);
         }

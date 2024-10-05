@@ -1,28 +1,24 @@
 package com.fabbroniko.sdi.context;
 
 import com.fabbroniko.sdi.annotation.Component;
-import com.fabbroniko.sdi.exception.CircularDependencyException;
-import com.fabbroniko.sdi.factory.ComponentFactory;
+import com.fabbroniko.sdi.exception.ComponentDefinitionException;
 import com.fabbroniko.sdi.factory.ComponentResolver;
 import com.fabbroniko.sdi.naming.QualifierResolver;
-import com.fabbroniko.sdi.registry.Registry;
 import com.fabbroniko.ul.Logger;
 import com.fabbroniko.ul.manager.LogManager;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.Optional;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -32,9 +28,7 @@ class DefaultApplicationContextTest {
     @Mock
     private Set<Class<?>> scannedComponents;
     @Mock
-    private Registry registry;
-    @Mock
-    private ComponentFactory componentFactory;
+    private StrategySelector strategySelector;
     @Mock
     private ComponentResolver componentResolver;
     @Mock
@@ -44,155 +38,108 @@ class DefaultApplicationContextTest {
     @Mock
     private Logger logger;
     @Mock
-    private Object instance;
+    private FirstTestClass instance;
+    @Mock
+    private Strategy strategy;
 
     private DefaultApplicationContext applicationContext;
 
     @BeforeEach
     void setUp() {
         when(logManager.getLogger(any())).thenReturn(logger);
+        when(strategySelector.select(any())).thenReturn(strategy);
 
         applicationContext = new DefaultApplicationContext(logManager,
             scannedComponents,
-            registry,
-            componentFactory,
+            strategySelector,
             componentResolver,
             nameResolver);
     }
 
     @Test
+    void shouldResolveName() {
+        doReturn(FirstTestClass.class).when(componentResolver).resolve(any(), any(), any());
+
+        applicationContext.getInstance(FirstTestClass.class);
+
+        verify(nameResolver).resolve(FirstTestClass.class);
+    }
+
+    @Test
+    void shouldLogGetInstance() {
+        doReturn(FirstTestClass.class).when(componentResolver).resolve(any(), any(), any());
+
+        applicationContext.getInstance(FirstTestClass.class);
+
+        verify(logger).trace("get_instance", "com.fabbroniko.sdi.context.DefaultApplicationContextTest$FirstTestClass", null);
+    }
+
+    @Test
     void shouldReturnSelfWhenTargetIsApplicationContext() {
+        reset(strategySelector);
+
         assertThat((Object) applicationContext.getInstance(ApplicationContext.class))
             .isEqualTo(applicationContext);
     }
 
     @Test
-    void shouldThrowCircularDependencyException() {
-        doReturn(Object.class).when(componentResolver).resolve(any(), any(), any());
-        when(registry.isProcessing(any())).thenReturn(true);
+    void shouldResolveClassToInitialize() {
+        doReturn(FirstTestClass.class).when(componentResolver).resolve(any(), any(), any());
+        when(nameResolver.resolve(any())).thenReturn("integer");
 
-        assertThatThrownBy(() -> applicationContext.getInstance(Integer.class))
-            .isInstanceOf(CircularDependencyException.class);
+        applicationContext.getInstance(FirstTestClass.class);
 
-        verify(logger).fatal("circular_dependency", "java.lang.Object");
+        verify(componentResolver).resolve(scannedComponents, FirstTestClass.class, "integer");
     }
 
-    @Nested
-    class GetInstanceTest {
+    @Test
+    void shouldLogResolveTargetClass() {
+        doReturn(FirstTestClass.class).when(componentResolver).resolve(any(), any(), any());
 
-        @BeforeEach
-        void setUp() {
-            doReturn(FirstTestClass.class).when(componentResolver).resolve(any(), any(), any());
-            when(registry.isProcessing(any())).thenReturn(false);
-            when(registry.getInstance(any())).thenReturn(Optional.of(instance));
-        }
+        applicationContext.getInstance(FirstTestClass.class);
 
-        @Test
-        void shouldLogGetInstance() {
-            applicationContext.getInstance(FirstTestClass.class);
+        verify(logger).trace(
+            "resolve_target_class",
+            "com.fabbroniko.sdi.context.DefaultApplicationContextTest$FirstTestClass",
+            null,
+            "com.fabbroniko.sdi.context.DefaultApplicationContextTest$FirstTestClass");
+    }
 
-            verify(logger).trace("get_instance", "com.fabbroniko.sdi.context.DefaultApplicationContextTest$FirstTestClass", null);
-        }
+    @Test
+    void shouldThrowExceptionWhenNonComponent() {
+        reset(strategySelector);
+        when(componentResolver.resolve(any(), any(), any())).thenReturn(Object.class);
 
-        @Test
-        void shouldResolveName() {
-            applicationContext.getInstance(FirstTestClass.class);
+        assertThatThrownBy(() -> applicationContext.getInstance(Object.class))
+            .isInstanceOf(ComponentDefinitionException.class)
+            .hasMessage("Resolved target class java.lang.Object is not a Component");
+    }
 
-            verify(nameResolver).resolve(FirstTestClass.class);
-        }
+    @Test
+    void shouldSelectStrategy() {
+        doReturn(FirstTestClass.class).when(componentResolver).resolve(any(), any(), any());
 
-        @Test
-        void shouldLogResolveTargetClass() {
-            applicationContext.getInstance(FirstTestClass.class);
+        applicationContext.getInstance(FirstTestClass.class);
 
-            verify(logger).trace(
-                "resolve_target_class",
-                "com.fabbroniko.sdi.context.DefaultApplicationContextTest$FirstTestClass",
-                null,
-                "com.fabbroniko.sdi.context.DefaultApplicationContextTest$FirstTestClass");
-        }
+        verify(strategySelector).select(FirstTestClass.class);
+    }
 
-        @Test
-        void shouldResolveClassToInitialize() {
-            when(nameResolver.resolve(any())).thenReturn("integer");
+    @Test
+    void shouldGetInstance() {
+        doReturn(FirstTestClass.class).when(componentResolver).resolve(any(), any(), any());
 
-            applicationContext.getInstance(FirstTestClass.class);
+        applicationContext.getInstance(FirstTestClass.class);
 
-            verify(componentResolver).resolve(scannedComponents, FirstTestClass.class, "integer");
-        }
+        verify(strategy).getInstance(FirstTestClass.class, applicationContext);
+    }
 
-        @Test
-        void shouldGetInstanceFromRegistry() {
-            applicationContext.getInstance(FirstTestClass.class);
+    @Test
+    void shouldReturnValueFromStrategy() {
+        doReturn(FirstTestClass.class).when(componentResolver).resolve(any(), any(), any());
+        when(strategy.getInstance(any(), any())).thenReturn(instance);
 
-            verify(registry).getInstance(FirstTestClass.class);
-        }
-
-        @Test
-        void shouldLogTargetFoundInRegistry() {
-            applicationContext.getInstance(FirstTestClass.class);
-
-            verify(logger).trace("target_found_in_registry", "com.fabbroniko.sdi.context.DefaultApplicationContextTest$FirstTestClass");
-        }
-
-        @Test
-        void shouldNotCreateFromFactory() {
-            applicationContext.getInstance(Integer.class);
-
-            verify(componentFactory, never()).create(any(), any());
-        }
-
-        @Test
-        void shouldReturnValue() {
-            assertThat((Object) applicationContext.getInstance(FirstTestClass.class))
-                .isEqualTo(instance);
-        }
-
-        @Test
-        void shouldRegisterTargetAsProcessing() {
-            when(registry.getInstance(any())).thenReturn(Optional.empty());
-
-            applicationContext.getInstance(FirstTestClass.class);
-
-            verify(registry).process(FirstTestClass.class);
-        }
-
-        @Test
-        void shouldLogCreateNewInstance() {
-            when(registry.getInstance(any())).thenReturn(Optional.empty());
-
-            applicationContext.getInstance(FirstTestClass.class);
-
-            verify(logger).trace("create_new_instance", "com.fabbroniko.sdi.context.DefaultApplicationContextTest$FirstTestClass");
-        }
-
-        @Test
-        void shouldCreateComponent() {
-            when(registry.getInstance(any())).thenReturn(Optional.empty());
-
-            applicationContext.getInstance(FirstTestClass.class);
-
-            verify(componentFactory).create(FirstTestClass.class, applicationContext);
-        }
-
-        @Test
-        void shouldRegisterNewInstance() {
-            when(registry.getInstance(any())).thenReturn(Optional.empty());
-            when(componentFactory.create(any(), any())).thenReturn(instance);
-
-            applicationContext.getInstance(FirstTestClass.class);
-
-            verify(registry).insert(FirstTestClass.class, instance);
-        }
-
-        @Test
-        void shouldReturnNewInstance() {
-            when(registry.getInstance(any())).thenReturn(Optional.empty());
-            when(componentFactory.create(any(), any())).thenReturn(instance);
-
-            assertThat((Object) applicationContext.getInstance(FirstTestClass.class))
-                .isEqualTo(instance);
-        }
+        assertThat(applicationContext.getInstance(FirstTestClass.class))
+            .isEqualTo(instance);
     }
 
     @Component
