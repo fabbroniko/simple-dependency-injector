@@ -27,13 +27,13 @@ class AnnotationBasedStrategySelectorTest {
     @Test
     void shouldReturnPrototypeStrategy() {
         assertThat(strategySelector.select(PrototypeClass.class))
-            .isInstanceOf(PrototypeStrategy.class);
+            .isEqualTo(prototypeStrategy);
     }
 
     @Test
     void shouldReturnSingletonStrategy() {
         assertThat(strategySelector.select(SingletonClass.class))
-            .isInstanceOf(PrototypeStrategy.class);
+            .isEqualTo(singletonStrategy);
     }
 
     private static class SingletonClass {}

@@ -10,9 +10,11 @@ import com.fabbroniko.sdi.target.interfaced.DependsOnInterface;
 import com.fabbroniko.sdi.target.interfacedcircular.A;
 import com.fabbroniko.sdi.target.log.WithLoggerDependency;
 import com.fabbroniko.sdi.target.noncomponent.NonComponent;
+import com.fabbroniko.sdi.target.prototype.PrototypeComponent;
 import com.fabbroniko.sdi.target.qualifier.Cat;
 import com.fabbroniko.sdi.target.qualifier.DependsOnMulti;
 import com.fabbroniko.sdi.target.qualifier.Dog;
+import com.fabbroniko.sdi.target.singleton.SingletonComponent;
 import com.fabbroniko.sdi.target.util.NoDependenciesTestClass;
 import com.fabbroniko.sdi.target.util.WithDependencyTestClass;
 import com.fabbroniko.ul.FormattedLogger;
@@ -103,5 +105,23 @@ public class DependencyInjectorTest {
 
         assertThatThrownBy(() -> applicationContext.getInstance(NonComponent.class))
             .isInstanceOf(ComponentDefinitionException.class);
+    }
+
+    @Test
+    void shouldCreateMultipleInstancesWithPrototype() {
+        final ApplicationContext applicationContext = DependencyInjector.run(PrototypeComponent.class);
+        final PrototypeComponent firstInstance = applicationContext.getInstance(PrototypeComponent.class);
+        final PrototypeComponent secondInstance = applicationContext.getInstance(PrototypeComponent.class);
+
+        assertThat(firstInstance).isNotEqualTo(secondInstance);
+    }
+
+    @Test
+    void shouldReturnSameInstancesWithSingleton() {
+        final ApplicationContext applicationContext = DependencyInjector.run(SingletonComponent.class);
+        final SingletonComponent firstInstance = applicationContext.getInstance(SingletonComponent.class);
+        final SingletonComponent secondInstance = applicationContext.getInstance(SingletonComponent.class);
+
+        assertThat(firstInstance).isEqualTo(secondInstance);
     }
 }
